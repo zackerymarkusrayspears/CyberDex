@@ -4,7 +4,7 @@ class TeacherSearcher extends Component {
     render() {
         return(
             <div>
-                {/* <p>Hello World</p> */}
+                <p>Hello World</p>
             </div>
         )
     }
