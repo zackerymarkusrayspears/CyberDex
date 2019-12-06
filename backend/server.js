@@ -38,7 +38,8 @@ app.use(logger('dev'));
 
 // Default route that will run whenever we first connect to the server
 router.get('/', (req, res) => {
-    res.json({ message: 'HELLO WORLD' });
+    console.log('Default Route');
+
 });
 
 // Route to retrieve data from the database
@@ -51,7 +52,6 @@ router.get('/getData', (req, res) => {
         if (err) {
             return res.json({ success: false, error: err });
         }
-
         return res.json({ success: true, data: data });
     });
 });
@@ -64,7 +64,15 @@ router.post('/postData', (req, res) => {
     // Pull the ID and message from the body of the request.
     const { id, number, building, extensions, firstName, lastName, room } = req.body;
 
-    // Configure the schema object.
+    // If ID does not have a value and is not equal to 0 or the firstName and lastName doesn't have a value, return an error.
+    if ((!id && id !== 0) || (!firstName || !lastName || !number)) {
+        return res.json({
+            success: false,
+            error: 'INVALID INPUT'
+        })
+    }
+
+    // Configure the Schema object.
     newData.id = id;
     newData.number = number;
     newData.building = building;
@@ -73,20 +81,11 @@ router.post('/postData', (req, res) => {
     newData.lastName = lastName;
     newData.room = room;
 
-    // If ID does not have a value and is not equal to 0 or the firstName and lastName doesn't have a value, return an error.
-    if ((!id && id !== 0) || (firstName || lastName === false)) {
-        return res.json({
-            success: false,
-            error: 'INVALID INPUT'
-        })
-    }
-
     // To save to the database.
     newData.save(err => {
         if (err) {
            return res.json({ success: false, error: err }); 
         }
-
         return res.json({ success: true });
     });
 });
