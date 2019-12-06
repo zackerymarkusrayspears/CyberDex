@@ -1,12 +1,17 @@
-import React from 'react';
+import React, { Component } from 'react';
+import TeacherSearcher from './TeacherSearcher'
 import './App.css';
 
-function App() {
-  return (
-    <div>
-      <p>Hello World</p>
-    </div>
-  );
+class App extends Component{
+  render() {
+    return(
+      <div>
+        <TeacherSearcher />
+      </div>
+    );
+  }
 }
 
 export default App;
+
+  
