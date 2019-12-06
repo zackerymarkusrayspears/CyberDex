@@ -1,12 +1,16 @@
 import React from 'react';
+import TeacherSearcher from './TeacherSearcher'
 import './App.css';
 
-function App() {
-  return (
-    <div>
-      <p>Hello World</p>
-    </div>
-  );
+function App(){
+    return(
+      <div>
+        <TeacherSearcher />
+      </div>
+    );
+  }
 }
 
 export default App;
+
+  
