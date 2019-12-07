@@ -7,6 +7,8 @@ import {
   Link
 } from 'react-router-dom'
 import Header from './Components/Header/Header';
+import Search from './Components/Search/Search';
+import Index from './Components/Index/Index';
 import Footer from './Components/Footer/Footer';
 
 class App extends Component {
@@ -31,10 +33,10 @@ class App extends Component {
             {/* Switch to determine the path followed by clicked Link */}
             <Switch>
                 <Route exact path='/search'>
-                    {/* Search Component */}
+                    <Search />
                 </Route>
                 <Route path='/index'>
-                    {/* Index Component */}
+                    <Index />
                 </Route>
             </Switch>
         </Router>
