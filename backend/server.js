@@ -38,8 +38,7 @@ app.use(logger('dev'));
 
 // Default route that will run whenever we first connect to the server
 router.get('/', (req, res) => {
-    console.log('Default Route');
-
+    console.log('MongoDB Connected');
 });
 
 // Route to retrieve data from the database
@@ -62,7 +61,7 @@ router.post('/postData', (req, res) => {
     let newData = new Data();
 
     // Pull the ID and message from the body of the request.
-    const { id, number, building, extensions, firstName, lastName, room } = req.body;
+    const { id, number, building, extensions, firstName, lastName, room, spreadsheetId, sheet } = req.body;
 
     // If ID does not have a value and is not equal to 0 or the firstName and lastName doesn't have a value, return an error.
     if ((!id && id !== 0) || (!firstName || !lastName || !number)) {
@@ -80,13 +79,14 @@ router.post('/postData', (req, res) => {
     newData.firstName = firstName;
     newData.lastName = lastName;
     newData.room = room;
+    newData.spreadsheetId = spreadsheetId;
+    newData.sheet = sheet;
 
     // To save to the database.
     newData.save(err => {
         if (err) {
            return res.json({ success: false, error: err }); 
-        }
-        return res.json({ success: true });
+        } else return res.json({ success: true });
     });
 });
 

@@ -11,7 +11,9 @@ const DataSchema = new Schema(
         extensions: Number,
         firstName: String,
         lastName: String,
-        room: Number
+        room: Number,
+        spreadsheetId: String,
+        sheet: String
     },
     { timestamps: true }
 );
