@@ -1,3 +1,24 @@
 .Footer {
-    background-color: lightgrey;
+    background-color: black;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+}
+
+#school-information {
+    color: white;
+    display: flex;
+    width: 350px;
+}
+
+.Footer2 {
+    background-color: black;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+}
+
+#contact-info {
+    color: white;
+    display:
 }
