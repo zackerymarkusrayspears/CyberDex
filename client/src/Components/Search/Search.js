@@ -4,13 +4,12 @@ class Header extends Component {
     render() {
     return(
         <div>
-            <div className = 'Search'>
             <form>
-           <input type='text' placeholder='Search For Teacher..'></input>
-           <button>Submit</button>
+                <input  className = 'Bar' type='text' placeholder='Search For Teacher..'></input>
+                <button className = "Button">Submit</button>
 
-           </form>
-           </div>
+             </form>
+           
         </div>
 
     );
@@ -19,3 +18,4 @@ class Header extends Component {
 }
 
 export default Header;
+
