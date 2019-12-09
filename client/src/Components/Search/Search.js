@@ -1,10 +1,21 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import './Search.css';
-
-export default class Search extends Component {
+class Header extends Component {
     render() {
-        return(
-            <h1>Search</h1>
-        );
-    }
+    return(
+        <div>
+            <form>
+                <input  className = 'Bar' type='text' placeholder='Search For Teacher..'></input>
+                <button className = "Button">Submit</button>
+
+             </form>
+           
+        </div>
+
+    );
+
+    } 
 }
+
+export default Header;
+
