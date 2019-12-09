@@ -11,13 +11,13 @@ export default class AddIndex extends Component {
         }
     }
 
-    getData = id => {
-        // Access current arrays.
+    getSpreadsheet = id => {
+        // Access current dataArray.
         const { dataArray } = this.state;
         // Bind this as self.
         const self = this;
         // Temporary acces token.
-        const accessToken = 'ya29.Il-0B6_ou63kwkWXBbEnwk5jr0IJf7F9_myRAsg1_iFctIe9Y1I-w7KLVf4zKUY0Tc3t2kIzvEnD0bZJYBDZDO0VG7j_Ite52LJScZhXPX-ySXHCR5M4tOzrxCudXUW1uw';
+        const accessToken = 'ya29.Il-0B84iKLf-cVS0VzaZItJiWWIAszeG18Ajdo5QeQqzkNzQjp2IKz-50LTwxUEmD3SzFPLAw852Shi36SrZc_sQIO4wSkj0Q4qVIdYTdEYtik9sb5sFjZSQcr9CyRpgZg';
 
         axios({
             method: 'GET',
@@ -35,7 +35,7 @@ export default class AddIndex extends Component {
             var getObject = {
                 spreadsheetId: id,
                 spreadsheetTitle: response.data.properties.title,
-                sheets: sheetArray
+                sheet: sheetArray
             };
             // Push getObject to newDataArray.
             newDataArray.push(getObject);
@@ -48,15 +48,38 @@ export default class AddIndex extends Component {
         });
     }
 
+    getValues = () => {
+        // Access current dataArray.
+        const { dataArray } = this.state;
+        // Temporary acces token.
+        const accessToken = 'ya29.Il-0B84iKLf-cVS0VzaZItJiWWIAszeG18Ajdo5QeQqzkNzQjp2IKz-50LTwxUEmD3SzFPLAw852Shi36SrZc_sQIO4wSkj0Q4qVIdYTdEYtik9sb5sFjZSQcr9CyRpgZg';
+
+        dataArray.forEach(data => {
+            for (var i = 0; i < data.sheet.length; i++ ) {
+                axios({
+                    method: 'GET',
+                    url: `https://sheets.googleapis.com/v4/spreadsheets/${data.spreadsheetId}/values/${data.sheet[i]}`,
+                    headers: { Authorization: `Bearer ${accessToken}` }   
+                }).then((response) => {
+                    console.log(response);
+                }).catch((error) => {
+                    console.log(error);
+                });
+            }
+        });
+    }
+
+
+
     addToArray = spreadsheetId => {
         // If spreadsheetId has a value call getData else return
         if (spreadsheetId) {
-            this.getData(spreadsheetId);
+            this.getSpreadsheet(spreadsheetId);
         } else return
     }
 
     removeFromArray = i => {
-        // Access current array.
+        // Access current dataArray.
         const { dataArray } = this.state;
         // Make a copy of array.
         const newDataArray = dataArray;
@@ -67,7 +90,7 @@ export default class AddIndex extends Component {
     }
 
     displayArray = () => {
-        // Access current array.
+        // Access current dataArray.
         const { dataArray } = this.state;
         // If dataArray has any values map dataArray else return.
         if (dataArray) {
@@ -80,14 +103,14 @@ export default class AddIndex extends Component {
                     <h6>{event.spreadsheetTitle}</h6>
                     <small>{'SpreadsheetID: ' + event.spreadsheetId}</small>
                     <br />
-                    <small>{'Sheets: ' + event.sheets}</small>
+                    <small>{'Sheets: ' + event.sheet}</small>
                 </li>
             ));
         } else return
     }
 
     render() {
-
+        // Access current addId.
         const { addId } = this.state;
         
         return(
@@ -108,7 +131,9 @@ export default class AddIndex extends Component {
                 <ol>
                     {this.displayArray()}
                 </ol>
-                <button>Submit</button>
+                <button
+                    onClick={() => this.getValues()}
+                >Submit</button>
             </div>
         );
     }
