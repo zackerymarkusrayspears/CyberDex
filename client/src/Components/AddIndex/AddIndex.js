@@ -6,9 +6,26 @@ export default class AddIndex extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            data: [],
             spreadArray: [],
             spreadId: ''
         }
+    }
+
+    componentDidMount() {
+        this.getDataFromDB();
+    }
+
+    getDataFromDB = () => {
+        axios({
+          url: 'http://localhost:3001/api/getData',
+          method: 'GET'
+        }).then((response) => {
+          console.log(response);
+          this.setState({ data: response.data.data });
+        }).catch((error) => {
+          console.log(error);
+        });
     }
 
     getSpreadsheet = id => {
@@ -21,7 +38,7 @@ export default class AddIndex extends Component {
         // Bind this as self.
         const self = this;
         // Temporary access token.
-        const accessToken = 'ya29.Il-1B8vfMM9RHP0CE2WVEf3uWvT8GcqGGAjXX5de3xfXLdXxknKkBQS7aUG8r2y2xsPNktqX5K7W5PdGKj3azV2HScK0gm5K7loEU0PRae5vZbhTBj7zDcgitsj0pFcWxw';
+        const accessToken = 'ya29.Il-0B7307V1BVF2OoSV85U2gSQTjvh6Sp3m0GJDJBKIOv7rLLjVfCqVhSIE-dHSRio167lsknbehLZXjZRA4VqfOogEhEatUZDJFgZo_kDwrh-dx2RbxCsTL5TYBBZujjw';
 
         axios({
 
@@ -36,8 +53,6 @@ export default class AddIndex extends Component {
             // For each sheet in the response call getValues with arguments of spreadsheetID, sheet title, and access token.
             for (var index = 0; index < response.data.sheets.length; index++ ) {
                 const sheet = response.data.sheets[index];
-
-                console.log(sheet.properties.title);
 
                 const objectArray = [];
 
@@ -123,7 +138,35 @@ export default class AddIndex extends Component {
 
     postArray = array => {
 
+        const { data } = this.state;
         console.log(array);
+
+        array.forEach(spread => {
+    
+            let currentIds = data.map(dat => dat.id);
+            let idToBeAdded = 0;
+            while (currentIds.includes(idToBeAdded)) {
+            idToBeAdded++;
+            }
+
+            console.log(idToBeAdded);
+
+            axios({
+              url: 'http://localhost:3001/api/postData',
+              method: 'POST',
+              data: {
+                id: idToBeAdded,
+                spreadsheetId: spread.spreadsheetId,
+                spreadsheetTitle: spread.spreadsheetTitle,
+                sheetTitle: spread.sheetTitle,
+                sheetValue: spread.sheetValue
+              }
+            }).then((reponse) => {
+              console.log(reponse);
+            }).catch((error) => {
+              console.log(error);
+            });
+        });
     }
 
     addToArray = id => {
@@ -180,7 +223,10 @@ export default class AddIndex extends Component {
                     type='text'
                     placeholder='Enter Spreadsheet-ID'
                     value={spreadId}
-                    onChange={event => this.setState({ spreadId: event.target.value })}
+                    onChange={event => {
+                        this.setState({ spreadId: event.target.value });
+                        this.getDataFromDB();
+                    }}
                     onKeyPress={event => {
                         if(event.key === 'Enter') {
                             this.addToArray(spreadId);
@@ -190,7 +236,10 @@ export default class AddIndex extends Component {
                 />
                 <button
                     className='Index-addBtn'
-                    onClick={() => this.addToArray(spreadId)}
+                    onClick={() => {
+                        this.addToArray(spreadId);
+                        this.setState({ spreadId: '' });
+                    }}
                 >Add</button>
                 <br />
                 <small><em>For Example: https://docs.google.com/spreadsheets/d/<b>Spreadsheet-ID</b>/edit#gid=0</em></small>
