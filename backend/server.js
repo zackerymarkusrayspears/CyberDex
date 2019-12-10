@@ -23,7 +23,7 @@ const app = express();
 const router = express.Router();
 
 // Use Mongoose to set up a connection to the database
-mongoose.connect(getSecret('dbUrl'), { useNewUrlParser: true, useFindAndModify: false });
+mongoose.connect(getSecret('dbUrl'), {useUnifiedTopology: true, useNewUrlParser: true, useFindAndModify: false });
 
 // Reference to our database connection
 let db = mongoose.connection;
@@ -61,10 +61,10 @@ router.post('/postData', (req, res) => {
     let newData = new Data();
 
     // Pull the ID and message from the body of the request.
-    const { id, number, building, extensions, firstName, lastName, room, spreadsheetId, sheet } = req.body;
+    const { id, spreadsheetId, spreadsheetTitle, sheetTitle, sheetValue} = req.body;
 
-    // If ID does not have a value and is not equal to 0 or the firstName and lastName doesn't have a value, return an error.
-    if ((!id && id !== 0) || (!firstName || !lastName || !number)) {
+    // If ID does not have a value and is not equal to 0 or if the any body variable doesn't have a value, return an error.
+    if ((!id && id !== 0) || (!spreadsheetId || !spreadsheetTitle || !sheetTitle || !sheetValue)) {
         return res.json({
             success: false,
             error: 'INVALID INPUT'
@@ -73,14 +73,10 @@ router.post('/postData', (req, res) => {
 
     // Configure the Schema object.
     newData.id = id;
-    newData.number = number;
-    newData.building = building;
-    newData.extensions = extensions;
-    newData.firstName = firstName;
-    newData.lastName = lastName;
-    newData.room = room;
     newData.spreadsheetId = spreadsheetId;
-    newData.sheet = sheet;
+    newData.spreadsheetTitle = spreadsheetTitle;
+    newData.sheetTitle = sheetTitle;
+    newData.sheetValue = sheetValue;
 
     // To save to the database.
     newData.save(err => {
@@ -93,17 +89,6 @@ router.post('/postData', (req, res) => {
 // Route to delete a given object from our database.
 router.delete('/deleteData', (req, res) => {
     Data.deleteOne({ id: req.body.id }, err => {
-        if (err) {
-            return res.json({ success: false, error: err });
-        } else {
-            return res.json({ success: true });
-        }
-    });
-});
-
-// Route to update an existing object in our database.
-router.post('/updateData', (req, res) => {
-    Data.updateOne({ id: req.body.id }, req.body.update, err => {
         if (err) {
             return res.json({ success: false, error: err });
         } else {

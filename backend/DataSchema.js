@@ -6,14 +6,10 @@ const Schema = mongoose.Schema;
 const DataSchema = new Schema(
     {
         id: Number,
-        number: Number,
-        buiding: Number,
-        extensions: Number,
-        firstName: String,
-        lastName: String,
-        room: Number,
         spreadsheetId: String,
-        sheet: String
+        spreadsheetTitle: String,
+        sheetTitle: Array,
+        sheetValue: Array
     },
     { timestamps: true }
 );
