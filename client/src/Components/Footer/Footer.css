@@ -2,11 +2,22 @@
     background-color: black;
     display: grid;
     width: 100%;
-    grid-template-columns: auto auto;
+    grid-template-columns: auto auto auto;
 }
 
 .footer-school-information {
     color: white;
     display: block;
-    
+}
+
+.FooterRight {
+    width: 500px;
+}
+
+.FooterMiddle {
+    text-align: left;
+}
+
+.FooterLeft {
+    text-align: left;
 }
