@@ -10,6 +10,9 @@ import Header from './Components/Header/Header';
 import Search from './Components/Search/Search';
 import Index from './Components/Index/Index';
 import Footer from './Components/Footer/Footer';
+// import Card from './Components/Card/Card';
+// import SearchForm from './Components/Search_Form/Search_Form';
+// import List from './Components/List/List';
 
 class App extends Component {
 
