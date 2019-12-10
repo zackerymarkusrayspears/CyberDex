@@ -10,6 +10,7 @@ import Header from './Components/Header/Header';
 import Search from './Components/Search/Search';
 import Index from './Components/Index/Index';
 import Footer from './Components/Footer/Footer';
+import Search_Form from './Components/Search_Form/Search_Form';
 
 class App extends Component {
 
@@ -33,7 +34,6 @@ class App extends Component {
             {/* Switch to determine the path followed by clicked Link */}
             <Switch>
                 <Route exact path='/search'>
-                    <Search />
                 </Route>
                 <Route path='/index'>
                     <Index />
@@ -41,6 +41,7 @@ class App extends Component {
             </Switch>
         </Router>
         <Footer />
+        <Search_Form />
       </div>
     );
   }
