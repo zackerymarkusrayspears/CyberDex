@@ -8,58 +8,61 @@ export default class SearchForm extends Component {
 
         return(
             <form className='SearchForm'>
-                <label>District:
-                    <select>
+                <div className='SearchForm-selectGrid'>
+                    <select className='SearchForm-select'>
                         <option 
                             selected
                             value={''}
-                        >Select</option>
+                        >District</option>
                         <option 
                             value={'barrenCounty'}
                         >Barren County</option>
                     </select>
-                </label>
-                <label>School:
-                    <select>
+                    <select className='SearchForm-select'>
                         <option 
                             selected
                             value={''}
-                        >Select</option>
+                        >School</option>
                         <option 
                             value={'redCross'}
                         >Red Cross Elementary </option>
                         <option 
                             value={'templeHill'}
                         >Temple Hill Elementary </option>
-                          <option 
+                        <option 
                             value={'parkCity'}
                         >Park City Elementary </option>
-                          <option 
+                        <option 
                             value={'northJackson'}
                         >North Jackson Elementary</option>
-                          <option 
+                        <option 
                             value={'hiseville'}
                         >Hiseville Elementary</option>
-                          <option 
+                        <option 
                             value={'austinTracy'}
                         >Austin Tracy Elementary</option>
-                          <option 
+                        <option 
                             value={'barrenMiddle'}
                         >Barren County Middle School</option>
-                          <option 
+                        <option 
                             value={'trojanAcademy'}
                         >Trojan Academy</option>
-                          <option 
+                        <option 
                             value={'barrenHigh'}
                         >Barren County High School</option>
                     </select>
-                </label>
+                </div>
                 <input  
                     className='SearchForm-input' 
                     type='text' 
                     placeholder='Search For Teacher..'
                     value={value}
                     onChange={event => handleInput(event)}
+                    onKeyPress={event => {
+                        if (event.key === 'Enter') {
+                            handleSearch();
+                        }
+                    }}
                 />
                 <button 
                     className = "SearchForm-button"
