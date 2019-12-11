@@ -12,6 +12,7 @@ import DeleteIndex from '../DeleteIndex/DeleteIndex';
 export default class Index extends Component {
 
     render() {
+        const { getDataFromDB, dbData } = this.props;
         return(
             <div className='Index'>
                 <Router>
@@ -27,10 +28,10 @@ export default class Index extends Component {
                     </nav>
                     <Switch>
                         <Route path='/index/add'>
-                            <AddIndex />
+                            <AddIndex getDataFromDB={getDataFromDB} dbData={dbData} />
                         </Route>
                         <Route path='/index/delete'>
-                            <DeleteIndex />
+                            <DeleteIndex getDataFromDB={getDataFromDB} dbData={dbData} />
                         </Route>
                     </Switch>
                 </Router>

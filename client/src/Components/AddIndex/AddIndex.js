@@ -6,26 +6,13 @@ export default class AddIndex extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            data: [],
             spreadArray: [],
             spreadId: ''
         }
     }
 
     componentDidMount() {
-        this.getDataFromDB();
-    }
-
-    getDataFromDB = () => {
-        axios({
-          url: 'http://localhost:3001/api/getData',
-          method: 'GET'
-        }).then((response) => {
-          console.log(response);
-          this.setState({ data: response.data.data });
-        }).catch((error) => {
-          console.log(error);
-        });
+        this.props.getDataFromDB();
     }
 
     getSpreadsheet = id => {
@@ -38,7 +25,7 @@ export default class AddIndex extends Component {
         // Bind this as self.
         const self = this;
         // Temporary access token.
-        const accessToken = 'ya29.Il-0B7307V1BVF2OoSV85U2gSQTjvh6Sp3m0GJDJBKIOv7rLLjVfCqVhSIE-dHSRio167lsknbehLZXjZRA4VqfOogEhEatUZDJFgZo_kDwrh-dx2RbxCsTL5TYBBZujjw';
+        const accessToken = 'ya29.Il-0B8Bi_exf_BUPueOvzyhdPEsL7zcdUzSEZFFiKtR2SoItEWf2R-dBIobxJclMeo9E99cuRq1ou2rtDDADlI8vb6dMe3BhkTalLBlXlpZAf8kbDaMfx0Uq4C_ePcf7gA';
 
         axios({
 
@@ -138,12 +125,12 @@ export default class AddIndex extends Component {
 
     postArray = array => {
 
-        const { data } = this.state;
+        const { dbData } = this.props;
         console.log(array);
 
         array.forEach(spread => {
     
-            let currentIds = data.map(dat => dat.id);
+            let currentIds = dbData.map(data => data.id);
             let idToBeAdded = 0;
             while (currentIds.includes(idToBeAdded)) {
             idToBeAdded++;
@@ -214,6 +201,7 @@ export default class AddIndex extends Component {
 
         // Access current spreadId and spreadArray.
         const { spreadId, spreadArray } = this.state;
+        const { getDataFromDB } = this.props;
         
         return(
             <div className='Index'>
@@ -225,7 +213,7 @@ export default class AddIndex extends Component {
                     value={spreadId}
                     onChange={event => {
                         this.setState({ spreadId: event.target.value });
-                        this.getDataFromDB();
+                        getDataFromDB();
                     }}
                     onKeyPress={event => {
                         if(event.key === 'Enter') {

@@ -23,7 +23,7 @@ const app = express();
 const router = express.Router();
 
 // Use Mongoose to set up a connection to the database
-mongoose.connect(getSecret('dbUrl'), {useUnifiedTopology: true, useNewUrlParser: true, useFindAndModify: false });
+mongoose.connect(getSecret('dbUrl'), { useNewUrlParser: true, useUnifiedTopology: true });
 
 // Reference to our database connection
 let db = mongoose.connection;

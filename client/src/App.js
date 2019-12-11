@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import './App.css';
 import {
   BrowserRouter as Router,
@@ -12,8 +13,34 @@ import Index from './Components/Index/Index';
 import Footer from './Components/Footer/Footer';
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      dbData: [],
+    }
+  }
+
+  componentDidMount = () => {
+    this.getDataFromDB();
+  }
+
+  getDataFromDB = () => {
+    console.log('getDataFromDB')
+    axios({
+      url: 'http://localhost:3001/api/getData',
+      method: 'GET'
+    }).then((response) => {
+      console.log(response);
+      this.setState({ dbData: response.data.data });
+    }).catch((error) => {
+      console.log(error);
+    });
+}
 
   render() {
+
+    const { dbData } = this.state;
+
     return(
       <div className='App'>
         <Router>
@@ -33,10 +60,10 @@ class App extends Component {
             {/* Switch to determine the path followed by clicked Link */}
             <Switch>
                 <Route exact path='/search'>
-                  <Search />
+                  <Search getDataFromDB={this.getDataFromDB} dbData={dbData} />
                 </Route>
                 <Route path='/index'>
-                    <Index />
+                    <Index getDataFromDB={this.getDataFromDB} dbData={dbData} />
                 </Route>
             </Switch>
         </Router>
