@@ -1,0 +1,14 @@
+.Header {
+    min-height: 10vh;
+    background-color: lightgrey;
+}
+
+.Header-navBar {
+    height: 10vh;
+}
+
+.Header-navLinks {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}

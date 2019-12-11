@@ -1,0 +1,28 @@
+.SearchForm {
+    display: flex;
+}
+
+.SearchForm-select, .SearchForm-input, .SearchForm-button {
+    font-size: 12pt;
+}
+
+.SearchForm-selectGrid {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-gap: 5px;
+}
+
+.SearchForm-select {
+
+}
+
+.SearchForm-input {
+    margin-left: 5px;
+    width: 100%;
+    overflow: hidden;
+    text-align: center;
+}
+
+.SearchForm-button {
+    margin-left: 5px;
+}
