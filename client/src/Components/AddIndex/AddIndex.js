@@ -25,7 +25,7 @@ export default class AddIndex extends Component {
         // Bind this as self.
         const self = this;
         // Temporary access token.
-        const accessToken = 'ya29.Il-0B8Bi_exf_BUPueOvzyhdPEsL7zcdUzSEZFFiKtR2SoItEWf2R-dBIobxJclMeo9E99cuRq1ou2rtDDADlI8vb6dMe3BhkTalLBlXlpZAf8kbDaMfx0Uq4C_ePcf7gA';
+        const accessToken = 'ya29.Il-0B64VXNeBFahF3nMhLWC-DDVTSsnW5uP4tI3J72wQY470-g1I164zMt2z9PHypoM6da-PI9jQuScWcjHRvMK05-iTKuGBmypvKRGn6nQKvLt1O6XyQaufXplSyrPUyw';
 
         axios({
 
@@ -34,14 +34,10 @@ export default class AddIndex extends Component {
             headers: { Authorization: `Bearer ${accessToken}` }
 
         }).then((response) => {
-
             console.log(response);
-            
             // For each sheet in the response call getValues with arguments of spreadsheetID, sheet title, and access token.
             for (var index = 0; index < response.data.sheets.length; index++ ) {
-                const sheet = response.data.sheets[index];
-
-                const objectArray = [];
+                const sheet = response.data.sheets[index], objectArray = [];
 
                 axios({
 
@@ -50,7 +46,6 @@ export default class AddIndex extends Component {
                     headers: { Authorization: `Bearer ${accessToken}` }
 
                 }).then((response) => {
-
                     console.log(response);
                     // Call checkValue with arguments of the sheets value array and sheet title.
                     if (self.checkValue(response.data.values)) {
@@ -70,12 +65,10 @@ export default class AddIndex extends Component {
                         titleArray.push(sheet.properties.title);
                         sheetArray.push({sheet: objectArray});
                     }
-
                 }).catch((error) => {
                     console.log(error);
                 });
             }
-            
             // Create variable getObject to store spreadsheet data.
             var spreadObject = {
                 spreadsheetId: id,
@@ -92,6 +85,7 @@ export default class AddIndex extends Component {
 
         }).catch((error) => {
             console.log(error);
+            alert(`Error: SpreadsheetID: ${id} not found.`);
         });
     }
 
@@ -106,7 +100,7 @@ export default class AddIndex extends Component {
                     const intValue = parseInt(row[i]);
                     // If value isn't a number return false and an alert to the client.
                     if (isNaN(intValue)) {
-                        alert(`Error: "${row[i]}" is not a valid number`);
+                        alert(`Error: "${row[i]}" is not a valid number.`);
                         return false;
                     }
                 } else { // String values.
@@ -125,46 +119,62 @@ export default class AddIndex extends Component {
 
     postArray = array => {
 
+        // Access current dbArray.
         const { dbData } = this.props;
-        console.log(array);
-
+        // For each spreadsheet object inside the array.
         array.forEach(spread => {
-    
-            let currentIds = dbData.map(data => data.id);
+            // Create an id.
             let idToBeAdded = 0;
+            // Map the current dbArray for existing ids.
+            let currentIds = dbData.map(data => data.id);
+            // While the created id is equal to an existing id, increment the id.
             while (currentIds.includes(idToBeAdded)) {
-            idToBeAdded++;
+                idToBeAdded++;
             }
-
-            console.log(idToBeAdded);
+            // Axios request to post the new id number and data from spreadsheet object.
 
             axios({
-              url: 'http://localhost:3001/api/postData',
-              method: 'POST',
-              data: {
-                id: idToBeAdded,
-                spreadsheetId: spread.spreadsheetId,
-                spreadsheetTitle: spread.spreadsheetTitle,
-                sheetTitle: spread.sheetTitle,
-                sheetValue: spread.sheetValue
-              }
+
+                url: 'http://localhost:3001/api/postData',
+                method: 'POST',
+                data: {
+                    id: idToBeAdded,
+                    spreadsheetId: spread.spreadsheetId,
+                    spreadsheetTitle: spread.spreadsheetTitle,
+                    sheetTitle: spread.sheetTitle,
+                    sheetValue: spread.sheetValue
+                }
+
             }).then((reponse) => {
-              console.log(reponse);
+                console.log(reponse);
             }).catch((error) => {
-              console.log(error);
+                console.log(error);
             });
         });
     }
 
-    addToArray = id => {
+    addToArray(id) {
 
-        // If id has a value call getData else return
-        if (id) {
+        // Access current dbArray.
+        const { dbData } = this.props;
+        // Create boolean to state if id exist.
+        let idNotExist = true;
+        // Create function to check if id exist in dbData.
+        dbData.map(data => {
+            if (id !== data.spreadsheetId) {
+                return
+            } else {
+                alert(`Error: "${data.spreadsheetTitle}" is already added to CyberDex.`)
+                return idNotExist = false
+            }
+        })
+        // If id has a value and checkDB returns true, call getData else return.
+        if (id && idNotExist) {
             this.getSpreadsheet(id);
         } else return
     }
 
-    removeFromArray = i => {
+    removeFromArray(i) {
 
         // Access current spreadArray.
         const { spreadArray } = this.state;
@@ -173,7 +183,7 @@ export default class AddIndex extends Component {
         // Splice from the index of the mapped key.
         newDataArray.splice(i, 1);
         // Set New array as the state.
-        return this.setState({ spreadArray: newDataArray});
+        this.setState({ spreadArray: newDataArray});
     }
 
     displayArray = () => {
@@ -201,6 +211,7 @@ export default class AddIndex extends Component {
 
         // Access current spreadId and spreadArray.
         const { spreadId, spreadArray } = this.state;
+        // Access getDataFromDB function to keep current dbData fresh.
         const { getDataFromDB } = this.props;
         
         return(
@@ -213,10 +224,10 @@ export default class AddIndex extends Component {
                     value={spreadId}
                     onChange={event => {
                         this.setState({ spreadId: event.target.value });
-                        getDataFromDB();
                     }}
                     onKeyPress={event => {
                         if(event.key === 'Enter') {
+                            getDataFromDB();
                             this.addToArray(spreadId);
                             this.setState({ spreadId: '' });
                         }
@@ -225,6 +236,7 @@ export default class AddIndex extends Component {
                 <button
                     className='Index-addBtn'
                     onClick={() => {
+                        getDataFromDB();
                         this.addToArray(spreadId);
                         this.setState({ spreadId: '' });
                     }}
