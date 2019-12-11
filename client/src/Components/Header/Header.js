@@ -8,7 +8,9 @@ export default class Header extends Component {
 
         return(
             <div className='Header'>
-                {children}
+                <div className='Header-main'>
+                    {children}
+                </div>
             </div>
         );
     }
