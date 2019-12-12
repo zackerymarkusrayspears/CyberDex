@@ -6,6 +6,8 @@ const express = require('express');
 const logger = require('morgan');
 // Body-Parser - Makes sure the body of our requests is formatted correctly (in this case, we'll use JSON).
 const bodyParser = require('body-parser');
+// cors - Handles data request made to mongodb.
+const cors = require('cors');
 
 // Import the getSecret function from the secret.js file
 const getSecret = require('./secret');
@@ -95,6 +97,9 @@ router.delete('/deleteData', (req, res) => {
         }
     });
 });
+
+// Tell Express to use use cors in te router.
+app.use(cors());
 
 // Tell Express to use a certain path and to use the router we set up.
 app.use('/api', router);
