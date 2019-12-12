@@ -3,6 +3,8 @@
 }
 
 .SearchForm-select, .SearchForm-input, .SearchForm-button {
+    background-color: black;
+    color: white;
     font-size: 12pt;
 }
 
@@ -12,17 +14,20 @@
     grid-gap: 5px;
 }
 
-.SearchForm-select {
-
-}
-
 .SearchForm-input {
+    background-color: black;
     margin-left: 5px;
     width: 100%;
     overflow: hidden;
-    text-align: center;
+    /* text-align: center; */
+}
+
+.SearchForm-input::placeholder {
+    color: white;
 }
 
 .SearchForm-button {
+    color: white;
+    background-color: black;
     margin-left: 5px;
 }
