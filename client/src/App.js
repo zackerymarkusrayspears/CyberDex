@@ -49,7 +49,7 @@ class App extends Component {
                 <nav className='Header-navBar'>
                     <ul className='Header-navLinks'>
                     <li className='Listed-item'>
-                        <Link className='Header-link' to='/search'>Search</Link>
+                        <Link className='Header-link' to='/'>Home</Link>
                     </li>
                     <li className='Listed-item'>
                         <Link className='Header-link' to='/index'>Index</Link>
@@ -59,8 +59,8 @@ class App extends Component {
             </Header>
             {/* Switch to determine the path followed by clicked Link */}
             <Switch>
-                <Route exact path='/search'>
-                  <Search getDataFromDB={this.getDataFromDB} dbData={dbData} />
+                <Route exact path='/'>
+                    <Search getDataFromDB={this.getDataFromDB} dbData={dbData} />
                 </Route>
                 <Route path='/index'>
                     <Index getDataFromDB={this.getDataFromDB} dbData={dbData} />
