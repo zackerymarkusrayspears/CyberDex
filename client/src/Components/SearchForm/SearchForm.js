@@ -3,70 +3,72 @@ import './SearchForm.css';
 
 export default class SearchForm extends Component {
 
+    addDistricts = array => {
+
+        return array.map((data, i) => {
+            return <option key={i} value={i}>
+                {data.spreadsheetTitle}
+            </option>
+        });
+    }
+
+    addSchools = district => {
+
+        if (district !== undefined) {
+            return district.sheet.map((data, i) => {
+                return <option key={i} value={i}>
+                    {data.title}
+                </option>
+            });
+        }
+    }
+
     render() {
-        const { value, handleInput, handleSearch } = this.props;
+        const { dbData, district, school, searchInput, changeDistrict, changeSchool, changeInput, handleSearch } = this.props;
 
         return(
             <form className='SearchForm'>
                 <div className='SearchForm-selectGrid'>
-                    <select className='SearchForm-select'>
+                    <select 
+                        className='SearchForm-select'
+                        onChange={event => changeDistrict(event)}
+                    >
                         <option 
-                            selected
+                            defaultValue
                             value={''}
                         >District</option>
-                        <option 
-                            value={'barrenCounty'}
-                        >Barren County</option>
+                        {this.addDistricts(dbData)}
                     </select>
-                    <select className='SearchForm-select'>
+                    <select 
+                        className='SearchForm-select'
+                        onChange={event => changeSchool(event)}
+                    >
                         <option 
-                            selected
+                            defaultValue
                             value={''}
                         >School</option>
-                        <option 
-                            value={'redCross'}
-                        >Red Cross Elementary </option>
-                        <option 
-                            value={'templeHill'}
-                        >Temple Hill Elementary </option>
-                        <option 
-                            value={'parkCity'}
-                        >Park City Elementary </option>
-                        <option 
-                            value={'northJackson'}
-                        >North Jackson Elementary</option>
-                        <option 
-                            value={'hiseville'}
-                        >Hiseville Elementary</option>
-                        <option 
-                            value={'austinTracy'}
-                        >Austin Tracy Elementary</option>
-                        <option 
-                            value={'barrenMiddle'}
-                        >Barren County Middle School</option>
-                        <option 
-                            value={'trojanAcademy'}
-                        >Trojan Academy</option>
-                        <option 
-                            value={'barrenHigh'}
-                        >Barren County High School</option>
+                        {this.addSchools(dbData[district])}
                     </select>
                 </div>
                 <input  
                     className='SearchForm-input' 
                     type='text' 
                     placeholder='Search For Teacher..'
-                    value={value}
-                    onChange={event => handleInput(event)}
+                    value={searchInput}
+                    onChange={event => changeInput(event)}
                     onKeyPress={event => {
                         if (event.key === 'Enter') {
-                            handleSearch();
+                            event.preventDefault();
+                            handleSearch(school, searchInput);
                         }
                     }}
                 />
                 <button 
                     className = "SearchForm-button"
-                    onClick={() => handleSearch()}
+                    onClick={event => {
+                        event.preventDefault();
+                        handleSearch(school, searchInput)
+                    }}
                 >Submit</button>
             </form>
         );
