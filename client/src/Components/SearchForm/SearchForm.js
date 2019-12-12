@@ -26,7 +26,7 @@ export default class SearchForm extends Component {
     render() {
         const { dbData, district, school, searchInput, changeDistrict, changeSchool, changeInput, handleSearch } = this.props;
 
-        return(
+        return (
             <form className='SearchForm'>
                 <div className='SearchForm-selectGrid'>
                     <select 
@@ -50,9 +50,9 @@ export default class SearchForm extends Component {
                         {this.addSchools(dbData[district])}
                     </select>
                 </div>
-                <input  
-                    className='SearchForm-input' 
-                    type='text' 
+                <input
+                    className='SearchForm-input'
+                    type='text'
                     placeholder='Search For Teacher..'
                     value={searchInput}
                     onChange={event => changeInput(event)}
@@ -72,5 +72,5 @@ export default class SearchForm extends Component {
                 >Submit</button>
             </form>
         );
-    } 
+    }
 }

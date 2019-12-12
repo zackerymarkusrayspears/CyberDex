@@ -48,11 +48,11 @@ class App extends Component {
             <Header>
                 <nav className='Header-navBar'>
                     <ul className='Header-navLinks'>
-                    <li className='Header-link'>
-                        <Link to='/search'>Search</Link>
+                    <li className='Listed-item'>
+                        <Link className='Header-link' to='/search'>Search</Link>
                     </li>
-                    <li className='Header-link'>
-                        <Link to='/index'>Index</Link>
+                    <li className='Listed-item'>
+                        <Link className='Header-link' to='/index'>Index</Link>
                     </li>
                     </ul>
                 </nav>
