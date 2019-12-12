@@ -1,37 +1,123 @@
 import React, { Component } from 'react';
 import './DeleteIndex.css';
+import axios from 'axios';
 
 export default class DeleteIndex extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            spreadArray: [],
+        }
+    }
 
-    displayDB() {
+    deleteFromDbData(array) {
 
+        array.forEach(value => {
 
+            axios({
+
+                method: 'DELETE',
+                url: 'http://localhost:3001/api/deleteData',
+                data: { id: value }
+
+            }).then((response) => {
+                console.log(response);
+            }).catch((error) => {
+                console.log(error);
+            });
+        });
+    }
+
+    checkArray = index => {
+
+        // Access current spreadArray.
+        const { spreadArray } = this.state;
+        // Create a let to hold a boolean value.
+        let notInArray = true;
+        // For each value in spreadArray, compare it to the id argument. If it is equal change idInArray to true.
+        spreadArray.forEach(value => {
+            if (index === value) {
+                notInArray = false;
+            }
+        })
+        // Return value of idInArray.
+        return notInArray;
+    }
+
+    addToArray(index) {
+
+        // Access current spreadArray.
+        const { spreadArray } = this.state;
+        // Make a copy of spreadArray.
+        const newArray = spreadArray;
+        // Push id into newArray.
+        newArray.push(index);
+        // Set state of spreadArray as new state.
+        this.setState({spreadArray: newArray});
+        console.log(spreadArray);
+    }
+
+    removeFromArray(index) {
+
+        // Access current spreadArray.
+        const { spreadArray } = this.state;
+        // Make a copy of array.
+        const newArray = spreadArray;
+        // Map values inside spreadArray. If id is equal to map splice newArray at the maps index.
+        spreadArray.map((value, i) => {
+            if (index === value) {
+                newArray.splice(i, 1);
+            }
+        });
+        // Set New array as the state.
+        this.setState({ spreadArray: newArray });
+        console.log(spreadArray);
+    }
+
+    displayArray = () => {
+
+        // Access current spreadArray.
+        const { dbData } = this.props;
+        // Return a listed item for each object inside the current dbData array.
+        return dbData.map((data, index) => {
+            return <li key={index}>
+                {/* Button to add item listed to spreadArray. */}
+                <button 
+                    onClick={() => {
+                        if (this.checkArray(index)) {
+                            this.addToArray(index)
+                        } else { 
+                            this.removeFromArray(index)
+                        }
+                    }}>Remove</button>
+                {/* Display data from each event. */}
+                <h3>{data.spreadsheetTitle}</h3>
+                <h6>Sheets:</h6>
+                <ul>
+                    {/* Return a listed item for each object inside the sheet array of data. */}
+                    {data.sheet.map((sheet, i) => {
+                        return <li key={i}>
+                            <small>{sheet.title}</small>
+                        </li>
+                    })}
+                </ul>
+            </li>
+        });
     }
 
     render() {
 
-        const { dbData } = this.props;
+        const { spreadArray } = this.state;
 
         return(
             <div className='DeleteIndex'>
                 <h3>Select Spreadsheet(s) to Remove:</h3>
                 <ol>
-                    {dbData.map((data, i) => {
-                        return (
-                            <li key={i}>
-                                {/* Button to add item listed to deleteArray */}
-                                <button onClick={() => {
-                                    this.addToArray(i)
-                                }}>X</button>
-                                {/* Display data from each event */}
-                                <h6>{data.spreadsheetTitle}</h6>
-                                <small>{'SpreadsheetID: ' + data.spreadsheetId}</small>
-                                <br />
-                                <small>{'Sheets: ' + data.sheetTitle}</small>
-                            </li>
-                        );
-                    })}
+                    {this.displayArray()}
                 </ol>
+                <button
+                    onClick={() => this.deleteFromDbData(spreadArray)}
+                >Submit</button>
             </div>
 
         );
