@@ -6,6 +6,8 @@ const express = require('express');
 const logger = require('morgan');
 // Body-Parser - Makes sure the body of our requests is formatted correctly (in this case, we'll use JSON).
 const bodyParser = require('body-parser');
+// cors - Handles data request made to mongodb.
+const cors = require('cors');
 
 // Import the getSecret function from the secret.js file
 const getSecret = require('./secret');
@@ -61,10 +63,10 @@ router.post('/postData', (req, res) => {
     let newData = new Data();
 
     // Pull the ID and message from the body of the request.
-    const { id, spreadsheetId, spreadsheetTitle, sheetTitle, sheetValue} = req.body;
+    const { id, spreadsheetId, spreadsheetTitle, sheet} = req.body;
 
     // If ID does not have a value and is not equal to 0 or if the any body variable doesn't have a value, return an error.
-    if ((!id && id !== 0) || (!spreadsheetId || !spreadsheetTitle || !sheetTitle || !sheetValue)) {
+    if ((!id && id !== 0) || (!spreadsheetId || !spreadsheetTitle || !sheet)) {
         return res.json({
             success: false,
             error: 'INVALID INPUT'
@@ -75,8 +77,7 @@ router.post('/postData', (req, res) => {
     newData.id = id;
     newData.spreadsheetId = spreadsheetId;
     newData.spreadsheetTitle = spreadsheetTitle;
-    newData.sheetTitle = sheetTitle;
-    newData.sheetValue = sheetValue;
+    newData.sheet = sheet;
 
     // To save to the database.
     newData.save(err => {
@@ -96,6 +97,9 @@ router.delete('/deleteData', (req, res) => {
         }
     });
 });
+
+// Tell Express to use use cors in te router.
+app.use(cors());
 
 // Tell Express to use a certain path and to use the router we set up.
 app.use('/api', router);

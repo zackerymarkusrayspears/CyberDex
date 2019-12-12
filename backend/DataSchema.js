@@ -8,8 +8,7 @@ const DataSchema = new Schema(
         id: Number,
         spreadsheetId: String,
         spreadsheetTitle: String,
-        sheetTitle: Array,
-        sheetValue: Array
+        sheet: Array,
     },
     { timestamps: true }
 );

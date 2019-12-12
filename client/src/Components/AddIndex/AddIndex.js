@@ -11,21 +11,17 @@ export default class AddIndex extends Component {
         }
     }
 
-    componentDidMount() {
-        this.props.getDataFromDB();
-    }
-
     getSpreadsheet = id => {
 
         // Access current titleArray, sheetArray, and spreadArray.
         const { spreadArray } = this.state;
-        const titleArray = [], sheetArray = [];
+        const sheetArray = [];
         // Create copies of all state arrays.
         var newDataArray = spreadArray;
         // Bind this as self.
         const self = this;
         // Temporary access token.
-        const accessToken = 'ya29.Il-0B64VXNeBFahF3nMhLWC-DDVTSsnW5uP4tI3J72wQY470-g1I164zMt2z9PHypoM6da-PI9jQuScWcjHRvMK05-iTKuGBmypvKRGn6nQKvLt1O6XyQaufXplSyrPUyw';
+        const accessToken = 'ya29.Il-0B8rSJrkaAruZrNqSCJ08F0QYCW_CAg_rDljj76VcK5KVD9GSOWwj-BtOJFj9tJ65Ug9uBjAJsOLGSE7bQxvW_DRLmXVcrSpHE5CcEKW7x1XsXVG2UVifUtMLwxW-lg';
 
         axios({
 
@@ -37,34 +33,54 @@ export default class AddIndex extends Component {
             console.log(response);
             // For each sheet in the response call getValues with arguments of spreadsheetID, sheet title, and access token.
             for (var index = 0; index < response.data.sheets.length; index++ ) {
-                const sheet = response.data.sheets[index], objectArray = [];
+                const sheet = response.data.sheets[index], title = sheet.properties.title, metaArray = [], personArray = [];
 
                 axios({
 
                     method: 'GET',
-                    url: `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${sheet.properties.title}`,
+                    url: `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${title}`,
                     headers: { Authorization: `Bearer ${accessToken}` }
 
                 }).then((response) => {
                     console.log(response);
-                    // Call checkValue with arguments of the sheets value array and sheet title.
-                    if (self.checkValue(response.data.values)) {
-                        // Iterate through array of rows.
-                        for (var i = 1; i < response.data.values.length; i++) {
-                            var row = response.data.values[i];
-                            // Assign values to object.
-                            const valObject = {
-                                extension: row[0],
-                                room: row[1],
-                                firstName: row[2],
-                                lastName: row[3]
+
+                    // Iterate through array of rows 2 - 10.
+                    for (let i = 1; i < 9; i++) {
+                        let metaData = response.data.values[i];
+                        if (metaData.length !== 0) {
+                            // Assign values to metaObject with metaData values.
+                            const metaObject = {
+                                line: self.checkValue(metaData[0]),
+                                number: self.checkValue(metaData[1])
                             }
-                            // Push getObject to objectArray for every row.
-                            objectArray.push(valObject);
+                            // Push metaObject to metaArray.
+                            metaArray.push(metaObject);
                         }
-                        titleArray.push(sheet.properties.title);
-                        sheetArray.push({sheet: objectArray});
                     }
+                    // Iterate through array of rows 12 - array length.
+                    for (let i = 11; i < response.data.values.length; i++) {
+                        let personData = response.data.values[i];
+                        // Assign values to personObject with personData values.
+                        const personObject = {
+                            phoneTag: self.checkValue(personData[0]),
+                            name: self.checkValue(personData[1]),
+                            room: self.checkValue(personData[2]),
+                            extension: self.checkValue(personData[3]),
+                            phoneNumber: self.checkValue(personData[4]),
+                            note: self.checkValue(personData[5])
+                        }
+                        // Push personObject to personArray for every row.
+                        personArray.push(personObject);
+                    }
+                    // Push sheet's title, metaArray and personArray as an object into sheetArray.
+                    sheetArray.push({
+                        title: title,
+                        value: {
+                            metaData: metaArray,
+                            personData: personArray
+                        }
+                    });
+                    
                 }).catch((error) => {
                     console.log(error);
                 });
@@ -73,8 +89,7 @@ export default class AddIndex extends Component {
             var spreadObject = {
                 spreadsheetId: id,
                 spreadsheetTitle: response.data.properties.title,
-                sheetTitle: titleArray,
-                sheetValue: sheetArray
+                sheet: sheetArray
             };
             // Push getObject to newDataArray.
             newDataArray.push(spreadObject);
@@ -84,40 +99,23 @@ export default class AddIndex extends Component {
             });
 
         }).catch((error) => {
-            console.log(error);
             alert(`Error: SpreadsheetID: ${id} not found.`);
+            console.log(error);
         });
     }
 
-    checkValue = array => {
+    checkValue = (value) => {
 
-        // Iterate through array of rows.
-        for (var index = 1; index < array.length; index++) {
-            var row = array[index];
-            // Iterate through array of values.
-            for(var i = 0; i < row.length; i++) {
-                if (i < 2) { // Number values.
-                    const intValue = parseInt(row[i]);
-                    // If value isn't a number return false and an alert to the client.
-                    if (isNaN(intValue)) {
-                        alert(`Error: "${row[i]}" is not a valid number.`);
-                        return false;
-                    }
-                } else { // String values.
-                    const regExp = /^[a-z ,.'-]+$/i, strValue = row[i].toLowerCase();
-                    const evalString = regExp.test(strValue);
-                    // If value isn't a name return false and an alert to the client.
-                    if (!evalString) {
-                        alert(`Error: "${row[i]}" is not a valid name.`);
-                        return false;
-                    }
-                }
-            }
+        // If row has a value.
+        if (value === undefined || value === "") {
+            return null
+        } else {
+            return value.trim();
         }
-        return true;
     }
 
     postArray = array => {
+        console.log(array);
 
         // Access current dbArray.
         const { dbData } = this.props;
@@ -141,12 +139,14 @@ export default class AddIndex extends Component {
                     id: idToBeAdded,
                     spreadsheetId: spread.spreadsheetId,
                     spreadsheetTitle: spread.spreadsheetTitle,
-                    sheetTitle: spread.sheetTitle,
-                    sheetValue: spread.sheetValue
+                    sheet: spread.sheet
                 }
 
             }).then((reponse) => {
                 console.log(reponse);
+                this.setState({
+                    spreadArray: []
+                })
             }).catch((error) => {
                 console.log(error);
             });
@@ -155,23 +155,29 @@ export default class AddIndex extends Component {
 
     addToArray(id) {
 
+        // Access current spreadArray.
+        const { spreadArray } = this.state;
         // Access current dbArray.
         const { dbData } = this.props;
         // Create boolean to state if id exist.
-        let idNotExist = true;
+        let idNotExist = true, idTitle = '';
         // Create function to check if id exist in dbData.
-        dbData.map(data => {
-            if (id !== data.spreadsheetId) {
-                return
-            } else {
-                alert(`Error: "${data.spreadsheetTitle}" is already added to CyberDex.`)
-                return idNotExist = false
+        dbData.forEach(data => {
+            if (id === data.spreadsheetId) {
+                idNotExist = false;
+                idTitle = data.spreadsheetTitle;
             }
-        })
+        });
+        spreadArray.forEach(data => {
+            if (id === data.spreadsheetId) {
+                idNotExist = false;
+                idTitle = data.spreadsheetTitle;
+            }
+        });
         // If id has a value and checkDB returns true, call getData else return.
-        if (id && idNotExist) {
+        if (idNotExist) {
             this.getSpreadsheet(id);
-        } else return
+        } else return alert(`Error: "${idTitle}" is already added to CyberDex.`);
     }
 
     removeFromArray(i) {
@@ -193,15 +199,12 @@ export default class AddIndex extends Component {
         // If spreadArray has any values map spreadArray else return.
         if (spreadArray) {
             // Iterate through array.
-            return spreadArray.map((event, i) => (
+            return spreadArray.map((data, i) => (
                 <li key={i}>
                     {/* Button to remove listed item from Array */}
                     <button onClick={() => this.removeFromArray(i)}>X</button>
                     {/* Display data from each event */}
-                    <h6>{event.spreadsheetTitle}</h6>
-                    <small>{'SpreadsheetID: ' + event.spreadsheetId}</small>
-                    <br />
-                    <small>{'Sheets: ' + event.sheetTitle}</small>
+                    <h3>{data.spreadsheetTitle}</h3>
                 </li>
             ));
         } else return

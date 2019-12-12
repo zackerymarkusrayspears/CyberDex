@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react';
 import './Search.css';
 import SearchForm from '../SearchForm/SearchForm';
