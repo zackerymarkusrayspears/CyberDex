@@ -21,7 +21,7 @@ export default class AddIndex extends Component {
         // Bind this as self.
         const self = this;
         // Temporary access token.
-        const accessToken = 'ya29.Il-0B_sFSZhNl_ME3D01kj6KksmLJB9rAArsN_j9_J1ZaCD2QXUYTWz1AtpRQyaStMkysgbGyJtQ8cb29xvHSsMZBwAIdkPm-VfFun0AbcGgSUIPcSOv2ROzMAHmXVkk2Q';
+        const accessToken = 'ya29.Il-0B8rSJrkaAruZrNqSCJ08F0QYCW_CAg_rDljj76VcK5KVD9GSOWwj-BtOJFj9tJ65Ug9uBjAJsOLGSE7bQxvW_DRLmXVcrSpHE5CcEKW7x1XsXVG2UVifUtMLwxW-lg';
 
         axios({
 
@@ -144,6 +144,9 @@ export default class AddIndex extends Component {
 
             }).then((reponse) => {
                 console.log(reponse);
+                this.setState({
+                    spreadArray: []
+                })
             }).catch((error) => {
                 console.log(error);
             });
@@ -196,13 +199,12 @@ export default class AddIndex extends Component {
         // If spreadArray has any values map spreadArray else return.
         if (spreadArray) {
             // Iterate through array.
-            return spreadArray.map((event, i) => (
+            return spreadArray.map((data, i) => (
                 <li key={i}>
                     {/* Button to remove listed item from Array */}
                     <button onClick={() => this.removeFromArray(i)}>X</button>
                     {/* Display data from each event */}
-                    <h6>{event.spreadsheetTitle}</h6>
-                    <small>{'SpreadsheetID: ' + event.spreadsheetId}</small>
+                    <h3>{data.spreadsheetTitle}</h3>
                 </li>
             ));
         } else return

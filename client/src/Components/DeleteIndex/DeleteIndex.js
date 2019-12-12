@@ -12,6 +12,8 @@ export default class DeleteIndex extends Component {
 
     deleteFromDbData(array) {
 
+        const { getDataFromDB } = this.props;
+
         array.forEach(value => {
 
             axios({
@@ -24,6 +26,7 @@ export default class DeleteIndex extends Component {
                 console.log(response);
             }).catch((error) => {
                 console.log(error);
+                getDataFromDB();
             });
         });
     }
