@@ -12,12 +12,16 @@ export default class Search extends Component {
             searchInput: '',
             display: []
         }
-        this.handleSearch = this.handleSearch.bind(this);
+    }
+
+    defaultInput = () => {
+
+        this.setState({
+            searchInput: ''
+        });
     }
 
     changeDistrict = event => {
-
-        const { dbData } = this.props;
 
         this.setState({
             district: event.target.value
@@ -51,6 +55,7 @@ export default class Search extends Component {
             // For ever person in personData
             for (var i = 0; i < school.value.personData.length; i++) {
                 var person = school.value.personData[i];
+                console.log(person.name);
                 // If name matches the person.
                 if (person.name === name) {
                     // Push person to newList
@@ -64,9 +69,9 @@ export default class Search extends Component {
                     // Push newObject to newDisplay
                     newDisplay.push(newObject);
                     // Set display as neDisplay.
-                    this.setState({display: newDisplay})
-                } else {
-                    alert('Error: Name is not in sheet.');
+                    return this.setState({display: newDisplay})
+                } else if (i === school.value.personData.length) {
+                    return alert('Error: Name is not in sheet.');
                 }
             }
         } else { // Search for All
@@ -106,6 +111,7 @@ export default class Search extends Component {
                     changeSchool={this.changeSchool}
                     changeInput={this.changeInput}
                     handleSearch={this.handleSearch}
+                    defaultInput={this.defaultInput}
                 />
                 <List display={display}/>
             </div>

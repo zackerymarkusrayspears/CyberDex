@@ -24,7 +24,7 @@ export default class SearchForm extends Component {
     }
 
     render() {
-        const { dbData, district, school, searchInput, changeDistrict, changeSchool, changeInput, handleSearch } = this.props;
+        const { dbData, district, school, searchInput, changeDistrict, changeSchool, changeInput, handleSearch, defaultInput } = this.props;
 
         return (
             <form className='SearchForm'>
@@ -60,6 +60,7 @@ export default class SearchForm extends Component {
                         if (event.key === 'Enter') {
                             event.preventDefault();
                             handleSearch(school, searchInput);
+                            defaultInput();
                         }
                     }}
                 />
@@ -67,7 +68,8 @@ export default class SearchForm extends Component {
                     className = "SearchForm-button"
                     onClick={event => {
                         event.preventDefault();
-                        handleSearch(school, searchInput)
+                        handleSearch(school, searchInput);
+                        defaultInput();
                     }}
                 >Submit</button>
             </form>
