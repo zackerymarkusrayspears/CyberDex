@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import './App.css';
-import {
+import {  
   BrowserRouter as Router,
   Switch,
   Route,
@@ -25,7 +25,7 @@ class App extends Component {
   }
 
   getDataFromDB = () => {
-    console.log('getDataFromDB')
+    
     axios({
       url: 'http://localhost:3001/api/getData',
       method: 'GET'
