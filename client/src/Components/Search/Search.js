@@ -24,17 +24,27 @@ export default class Search extends Component {
     changeDistrict = event => {
 
         this.setState({
-            district: event.target.value
+            district: event.target.value,
+            display: []
         });
     }
 
     changeSchool = event => {
+
         const { district } = this.state, { dbData } = this.props;
         const newSchool = dbData[district].sheet[event.target.value];
 
         this.setState({
             school: newSchool
         });
+
+        if (newSchool === undefined) {
+            return this.setState({
+                display: []
+            })
+        }
+
+        this.handleSearch(newSchool, '');
     }
 
     changeInput = event => {
@@ -46,9 +56,11 @@ export default class Search extends Component {
     handleSearch = (school, name) => {
 
         const newDisplay = [], newList = [];
-
-        if (school === undefined || school === '' ) {
-            return alert('Error: District or School is not defined.');
+        // Create an object to hold new data.
+        var newObject = {
+            title: school.title,
+            metaList: school.value.metaData,
+            personList: newList
         }
 
         if (name !== '') { // Search for single return.
@@ -60,32 +72,22 @@ export default class Search extends Component {
                 if (person.name === name) {
                     // Push person to newList
                     newList.push(person);
-                    // Create an object to hold new data.
-                    var newObject = {
-                        title: school.title,
-                        metaList: school.value.metaData,
-                        personList: newList
-                    }
                     // Push newObject to newDisplay
                     newDisplay.push(newObject);
                     // Set display as neDisplay.
                     return this.setState({display: newDisplay})
-                } else if (i === school.value.personData.length) {
-                    return alert('Error: Name is not in sheet.');
                 }
             }
+
+            alert('Error: Name is not in sheet.');
+            return this.setState({ display: [] });
+
         } else { // Search for All
             // For ever person in personData
             for (var i = 0; i < school.value.personData.length; i++) {
                 var person = school.value.personData[i];
                 // Push person to newList
                 newList.push(person);
-            }
-            // Create an object to hold new data.
-            var newObject = {
-                title: school.title,
-                metaList: school.value.metaData,
-                personList: newList
             }
             // Push newObject to newDisplay
             newDisplay.push(newObject);
