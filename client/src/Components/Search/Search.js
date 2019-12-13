@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './Search.css';
 import SearchForm from '../SearchForm/SearchForm';
+import List from '../List/List';
 
 export default class Search extends Component {
     constructor(props) {
@@ -9,9 +10,9 @@ export default class Search extends Component {
             district: '',
             school: '',
             searchInput: '',
-            displayMeta: [],
-            displaySearch: []
+            display: []
         }
+        this.handleSearch = this.handleSearch.bind(this);
     }
 
     changeDistrict = event => {
@@ -21,7 +22,6 @@ export default class Search extends Component {
         this.setState({
             district: event.target.value
         });
-        console.log(dbData[event.target.value]);
     }
 
     changeSchool = event => {
@@ -31,83 +31,68 @@ export default class Search extends Component {
         this.setState({
             school: newSchool
         });
-        console.log(newSchool);
     }
 
     changeInput = event => {
         this.setState({
             searchInput: event.target.value 
         });
-        console.log(event.target.value);
     }
 
     handleSearch = (school, name) => {
 
+        const newDisplay = [], newList = [];
+
         if (school === undefined || school === '' ) {
-            return alert('Error: School is not defined.');
+            return alert('Error: District or School is not defined.');
         }
 
         if (name !== '') { // Search for single return.
-            school.value.personData.forEach(data => {
-                if (data.name === name) {
-                    this.addToDisplay(school, data);
+            // For ever person in personData
+            for (var i = 0; i < school.value.personData.length; i++) {
+                var person = school.value.personData[i];
+                // If name matches the person.
+                if (person.name === name) {
+                    // Push person to newList
+                    newList.push(person);
+                    // Create an object to hold new data.
+                    var newObject = {
+                        title: school.title,
+                        metaList: school.value.metaData,
+                        personList: newList
+                    }
+                    // Push newObject to newDisplay
+                    newDisplay.push(newObject);
+                    // Set display as neDisplay.
+                    this.setState({display: newDisplay})
+                } else {
+                    alert('Error: Name is not in sheet.');
                 }
-            });
+            }
         } else { // Search for All
-            school.value.personData.forEach(data => {
-                this.addToDisplay(school, data);
-            });
-        }
-    }
-
-    addToDisplay = (school, person) => {
-
-        const { displayMeta, displaySearch } = this.state;
-        let newMeta = displayMeta, newSearch = displaySearch, inMeta = false, inSearch = false;
-
-        displayMeta.forEach(data => {
-            if (school.title === data.title || inMeta) {
-                inMeta = true;
+            // For ever person in personData
+            for (var i = 0; i < school.value.personData.length; i++) {
+                var person = school.value.personData[i];
+                // Push person to newList
+                newList.push(person);
             }
-        });
-        if (!inMeta) {
-            const metaObject = {
+            // Create an object to hold new data.
+            var newObject = {
                 title: school.title,
-                metaData: school.value.metaData
+                metaList: school.value.metaData,
+                personList: newList
             }
-            newMeta.push(metaObject);
-            this.setState({
-                displayMeta: newMeta
-            })
-            console.log(displayMeta);
-            console.log('^ dislpayMeta');
-        }
-        displaySearch.forEach(data => {
-            if (person.name === data.name || inSearch) {
-                inSearch = true;
-            }
-        });
-        if (!inSearch) {
-            const searchObject = {
-                phoneTag: person.phoneTag,
-                name: person.name,
-                room: person.room,
-                extension: person.extension,
-                phoneNumber: person.phoneNumber,
-                note: person.note
-            }
-            newSearch.push(searchObject);
-            this.setState({
-                displaySearch: newSearch
-            })
-            console.log(displaySearch);
-            console.log('^ displaySearch');
+            // Push newObject to newDisplay
+            newDisplay.push(newObject);
+            // Set display as neDisplay.
+            this.setState({display: newDisplay})
         }
     }
+
 
     render() {
 
-        const { district, school, searchInput } = this.state;
+        const { district, school, searchInput, display } = this.state;
         const{ dbData } = this.props;
 
         return(
@@ -122,7 +107,7 @@ export default class Search extends Component {
                     changeInput={this.changeInput}
                     handleSearch={this.handleSearch}
                 />
-                <p>{this.state.searchInput}</p>
+                <List display={display}/>
             </div>
         );
     }

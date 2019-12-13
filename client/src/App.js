@@ -25,7 +25,7 @@ class App extends Component {
   }
 
   getDataFromDB = () => {
-    console.log('getDataFromDB')
+    
     axios({
       url: 'http://localhost:3001/api/getData',
       method: 'GET'
