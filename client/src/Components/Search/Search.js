@@ -25,6 +25,8 @@ export default class Search extends Component {
 
         this.setState({
             district: event.target.value,
+            school: '',
+            searchInput: '',
             display: []
         });
     }
@@ -35,7 +37,8 @@ export default class Search extends Component {
         const newSchool = dbData[district].sheet[event.target.value];
 
         this.setState({
-            school: newSchool
+            school: newSchool,
+            searchInput: ''
         });
 
         if (newSchool === undefined) {
@@ -55,6 +58,8 @@ export default class Search extends Component {
 
     handleSearch = (school, name) => {
 
+        if (school === undefined || school === '') return
+
         const newDisplay = [], newList = [];
         // Create an object to hold new data.
         var newObject = {
@@ -63,11 +68,11 @@ export default class Search extends Component {
             personList: newList
         }
 
+
         if (name !== '') { // Search for single return.
             // For ever person in personData
             for (var i = 0; i < school.value.personData.length; i++) {
                 var person = school.value.personData[i];
-                console.log(person.name);
                 // If name matches the person.
                 if (person.name === name) {
                     // Push person to newList
@@ -80,7 +85,7 @@ export default class Search extends Component {
             }
 
             alert('Error: Name is not in sheet.');
-            return this.setState({ display: [] });
+            return this.handleSearch(school, '');
 
         } else { // Search for All
             // For ever person in personData
