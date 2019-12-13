@@ -56,10 +56,11 @@ export default class Search extends Component {
         });
     }
 
-    handleSearch = (school, name) => {
+    handleSearch = (school, value) => {
 
         if (school === undefined || school === '') return
 
+        const name = value.toLowerCase().trim()
         const newDisplay = [], newList = [];
         // Create an object to hold new data.
         var newObject = {
