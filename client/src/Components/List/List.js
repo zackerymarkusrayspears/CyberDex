@@ -1,16 +1,22 @@
 import React, { Component } from 'react';
-import './List.css'
+import './List.css';
+import Card from '../Card/Card';
 
 class List extends Component {
 
     renderMetaList = array => {
 
         if (array.length > 0) {
-            return array[0].metaList.map((data, i) => {
-                return <li key={i}>
-                    {`${data.line}: ${data.number}`}
-                </li>
-            })
+            return <div className='List-metaData'>
+                <h2 className='List-metaTitle'>Main Lines</h2>
+                <ul className='List-metaList'>
+                    {array[0].metaList.map((data, i) => {
+                        return <li key={i}>
+                            <p className='List-metaItem'>{`- ${this.capitalize(data.line)}: ${data.number}`}</p>
+                        </li>
+                    })}
+                </ul>
+            </div>
         }
     }
 
@@ -18,16 +24,28 @@ class List extends Component {
     
         if (array.length > 0) {
             return array[0].personList.map((data, i) => {
-                return <li key={i}>
-                    <h3>{data.name}</h3>
-                    <h4>{`Phone Tag: ${data.phoneTag}`}</h4>
-                    <h4>{`Room: ${data.room}`}</h4>
-                    <h4>{`Extension: ${data.extension}`}</h4>
-                    <h4>{`Phone Number: ${data.phoneNumber}`}</h4>
-                    <p>{`Note: ${data.note}`}</p>
-                </li>
+                return <Card 
+                    key={i}
+                    name={data.name}
+                    phoneTag={data.phoneTag}
+                    room={data.room}
+                    extension={data.extension}
+                    phoneNumber={data.phoneNumber}
+                    note={data.note}
+                    capitalize={this.capitalize}
+                />
             });
         }
+    }
+
+    capitalize = str => {
+
+        const strArray = str.split(' ');
+        var capitalizedArray = strArray.map(value => {
+            return value.charAt(0).toUpperCase() + value.slice(1)
+
+        });
+        return capitalizedArray.join(' ');
     }
 
     render() {
@@ -37,17 +55,13 @@ class List extends Component {
         return (
 
             <div className='List'>
-                <div className='List-metaData'>
-                    {display.length > 0 ? (
-                        <h1>{display[0].title}</h1>
-                    ) : (
-                        <h1>CyberDex</h1>
-                    )}
-                    <ul className='List-metaList'>
-                        {this.renderMetaList(display)}
-                    </ul>
-                </div>
-                <ul className='List-unordList'>
+                {display.length < 1 ? (
+                    <h1 className='List-defaultTitle'>CyberDex</h1>
+                ) : (
+                    <h1 className='List-sheetTitle'>{display[0].title}</h1>
+                )}
+                {this.renderMetaList(display)}
+                <ul className='List-personList'>
                     {this.renderUnordList(display)}
                 </ul>
             </div>

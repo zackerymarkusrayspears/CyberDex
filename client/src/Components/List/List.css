@@ -1,0 +1,50 @@
+/* .List {
+} */
+
+.List-defaultTitle {
+    margin: 5% 0;
+    text-align: center;
+    font-size: 3em;
+}
+
+.List-sheetTitle {
+    margin: 5% 0;
+    text-align: center;
+    font-size: 3em;
+}
+
+.List-metaData {
+    margin: 5% 10%;
+    background-color: whitesmoke;
+    border: 1px solid wheat;
+    border-radius: 5px;
+}
+
+.List-metaTitle {
+    margin: 0 0 1%;
+    padding: 0 1%;
+    color: whitesmoke;
+    background-color: #780012;
+    border-bottom: 1px solid wheat;
+    border-radius: 5px 5px 0 0;
+}
+
+.List-metaList {
+    margin: 0;
+    padding: 0 2%;
+    list-style: none;
+}
+
+.List-metaItem {
+    margin: 5px 0;
+}
+
+.List-personList {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-around;
+}
