@@ -1,8 +1,8 @@
 .Footer {
-    background-color: black;
-    display: grid;
     width: 100%;
-    grid-template-columns: auto auto auto;
+    display: grid;
+    grid-template-columns: auto auto 50%;
+    background-color: black;
 }
 
 .footer-school-information {
@@ -10,15 +10,17 @@
     display: block;
 }
 
-.FooterRight {
-    text-align: left;
-    width: 530px;
-}
-
-.FooterMiddle {
+.FooterRight, .FooterMiddle, .FooterRight {
     text-align: left;
 }
 
-.FooterLeft {
-    text-align: left;
+@media only screen and (max-width: 600px) {
+
+    .Footer {
+        grid-template-columns: auto auto;
+    }
+
+    .FooterRight {
+        display: none;
+    }
 }
