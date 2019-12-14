@@ -3,25 +3,21 @@
 }
 
 .SearchForm-select, .SearchForm-input, .SearchForm-button {
+    padding: 0 2px;
     background-color: black;
     color: white;
-    font-size: 12pt;
+    font-size: 1em;
 }
 
 .SearchForm-selectGrid {
-    display: grid;
-    grid-template-columns: auto auto;
-    grid-gap: 5px;
+    display: flex;
 }
 
 .SearchForm-input {
     background-color: black;
-    margin-left: 5px;
     width: 100%;
-    overflow: hidden;
     border: none;
     border-radius: 5px;
-    /* text-align: center; */
 }
 
 .SearchForm-input::placeholder {
@@ -31,6 +27,25 @@
 .SearchForm-button {
     color: white;
     background-color: black;
-    margin-left: 5px;
     border-radius: 5px;
+}
+
+@media only screen and (max-width: 600px) {
+    .SearchForm, .SearchForm-selectGrid {
+        flex-direction: column;
+    }
+
+    .SearchForm-select, .SearchForm-input, .SearchForm-button {
+        margin: 1% 0;
+    }
+}
+
+@media only screen and (min-width: 601px) {
+    .SearchForm-select, .SearchForm-input {
+        margin-right: 1%;
+    }
+
+    .SearchForm-input {
+        overflow: hidden;
+    }
 }

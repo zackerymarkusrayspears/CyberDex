@@ -28,28 +28,26 @@ export default class SearchForm extends Component {
 
         return (
             <form className='SearchForm'>
-                <div className='SearchForm-selectGrid'>
-                    <select 
-                        className='SearchForm-select'
-                        onChange={event => changeDistrict(event)}
-                    >
-                        <option 
-                            defaultValue
-                            value={''}
-                        >District</option>
-                        {this.addDistricts(dbData)}
-                    </select>
-                    <select 
-                        className='SearchForm-select'
-                        onChange={event => changeSchool(event)}
-                    >
-                        <option 
-                            defaultValue
-                            value={''}
-                        >School</option>
-                        {this.addSchools(dbData[district])}
-                    </select>
-                </div>
+                <select 
+                    className='SearchForm-select'
+                    onChange={event => changeDistrict(event)}
+                >
+                    <option 
+                        defaultValue
+                        value={''}
+                    >District</option>
+                    {this.addDistricts(dbData)}
+                </select>
+                <select 
+                    className='SearchForm-select'
+                    onChange={event => changeSchool(event)}
+                >
+                    <option 
+                        defaultValue
+                        value={''}
+                    >School</option>
+                    {this.addSchools(dbData[district])}
+                </select>
                 <input
                     className='SearchForm-input'
                     type='text'
