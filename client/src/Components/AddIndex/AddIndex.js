@@ -17,11 +17,11 @@ export default class AddIndex extends Component {
         const { spreadArray } = this.state;
         const sheetArray = [];
         // Create copies of all state arrays.
-        var newDataArray = spreadArray;
+        var newDataArray = [];
         // Bind this as self.
         const self = this;
         // Temporary access token.
-        const accessToken = 'ya29.Il-1B16q5LO8LkiwN3Qo1kUAa0u9H_WUBktSHKQdy_N3y7vwvuCQ0w32Syv3Axe5IQR3l7TnjlvhkGaUCyCSdQcIrDsp8fRJxhGYydpYMJ7_MUNdSJAFroomRzUYpoS1wg';
+        const accessToken = 'ya29.Il-1Byyki7T95-fqlhEeJtDIRliXEW4JFQLPcCN4t1gydj5RzeQ7_wV4pu3NofH8aqXEPWSjipgcmN-HlZYaNYYNC3758pbPtf-xZwNrqtM14iQmpmd-nZmmMQvcorwxyg';
 
         axios({
 
@@ -35,6 +35,9 @@ export default class AddIndex extends Component {
             for (var index = 0; index < response.data.sheets.length; index++ ) {
                 const sheet = response.data.sheets[index], title = sheet.properties.title, metaArray = [], personArray = [];
 
+                var sheetsLength = response.data.sheets.length;
+                var spreadsheetTitle = response.data.properties.title;
+                
                 axios({
 
                     method: 'GET',
@@ -72,31 +75,39 @@ export default class AddIndex extends Component {
                         // Push personObject to personArray for every row.
                         personArray.push(personObject);
                     }
+                    var newTitle = prompt(`Name sheet title for "${title}"`)
                     // Push sheet's title, metaArray and personArray as an object into sheetArray.
                     sheetArray.push({
-                        title: title,
+                        title: newTitle,
                         value: {
                             metaData: metaArray,
                             personData: personArray
                         }
                     });
-                    
+
+                    if (index === sheetsLength) {
+
+                        newDataArray = [];
+
+                        // Create variable getObject to store spreadsheet data.
+                        var spreadObject = {
+                            spreadsheetId: id,
+                            spreadsheetTitle: spreadsheetTitle,
+                            sheet: sheetArray
+                        };
+                        // Push getObject to newDataArray.
+                        newDataArray.push(spreadObject);
+                        // Update spreadTitleArray with newDataArray.
+                        self.setState({ 
+                            spreadArray: newDataArray
+                        });
+
+                        console.log(newDataArray);
+                    }
                 }).catch((error) => {
                     console.log(error);
                 });
             }
-            // Create variable getObject to store spreadsheet data.
-            var spreadObject = {
-                spreadsheetId: id,
-                spreadsheetTitle: response.data.properties.title,
-                sheet: sheetArray
-            };
-            // Push getObject to newDataArray.
-            newDataArray.push(spreadObject);
-            // Update spreadTitleArray with newDataArray.
-            self.setState({ 
-                spreadArray: newDataArray
-            });
 
         }).catch((error) => {
             alert(`Error: SpreadsheetID: ${id} not found.`);
