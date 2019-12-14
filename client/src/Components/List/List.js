@@ -8,7 +8,7 @@ class List extends Component {
 
         if (array.length > 0) {
             return <div className='List-metaData'>
-                <h2 className='List-metaTitle'>Main Lines</h2>
+                <h2 className='List-metaTitle'>Lines</h2>
                 <ul className='List-metaList'>
                     {array[0].metaList.map((data, i) => {
                         return <li key={i}>
@@ -23,18 +23,23 @@ class List extends Component {
     renderUnordList(array) {
     
         if (array.length > 0) {
-            return array[0].personList.map((data, i) => {
-                return <Card 
-                    key={i}
-                    name={data.name}
-                    phoneTag={data.phoneTag}
-                    room={data.room}
-                    extension={data.extension}
-                    phoneNumber={data.phoneNumber}
-                    note={data.note}
-                    capitalize={this.capitalize}
-                />
-            });
+            return <div className='List-personData'>
+                <h2 className='List-personTitle'>Search Results</h2>
+                <ul className='List-personList'>
+                    {array[0].personList.map((data, i) => {
+                        return <Card 
+                            key={i}
+                            name={data.name}
+                            phoneTag={data.phoneTag}
+                            room={data.room}
+                            extension={data.extension}
+                            phoneNumber={data.phoneNumber}
+                            note={data.note}
+                            capitalize={this.capitalize}
+                        />
+                    })}
+                </ul>
+            </div>
         }
     }
 
@@ -61,9 +66,7 @@ class List extends Component {
                     <h1 className='List-sheetTitle'>{display[0].title}</h1>
                 )}
                 {this.renderMetaList(display)}
-                <ul className='List-personList'>
-                    {this.renderUnordList(display)}
-                </ul>
+                {this.renderUnordList(display)}
             </div>
         );
     }
