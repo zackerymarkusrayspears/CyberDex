@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './Card.css';
 
-class Card extends Component {
+export default class Card extends Component {
 
     render() {
 
@@ -46,5 +46,5 @@ class Card extends Component {
                 </div>
             </li>
         </div>
-
-export default Card
+    }
+}
