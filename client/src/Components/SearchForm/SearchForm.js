@@ -48,28 +48,30 @@ export default class SearchForm extends Component {
                     >School</option>
                     {this.addSchools(dbData[district])}
                 </select>
-                <input
-                    className='SearchForm-input'
-                    type='text'
-                    placeholder='Search For Teacher..'
-                    value={searchInput}
-                    onChange={event => changeInput(event)}
-                    onKeyPress={event => {
-                        if (event.key === 'Enter') {
+                <div className='SearchForm-searchBar'>
+                    <input
+                        className='SearchForm-input'
+                        type='text'
+                        placeholder='Search For Teacher..'
+                        value={searchInput}
+                        onChange={event => changeInput(event)}
+                        onKeyPress={event => {
+                            if (event.key === 'Enter') {
+                                event.preventDefault();
+                                handleSearch(school, searchInput);
+                                defaultInput();
+                            }
+                        }}
+                    />
+                    <button 
+                        className = "SearchForm-button"
+                        onClick={event => {
                             event.preventDefault();
                             handleSearch(school, searchInput);
                             defaultInput();
-                        }
-                    }}
-                />
-                <button 
-                    className = "SearchForm-button"
-                    onClick={event => {
-                        event.preventDefault();
-                        handleSearch(school, searchInput);
-                        defaultInput();
-                    }}
-                >Submit</button>
+                        }}
+                    >Submit</button>
+                </div>
             </form>
         );
     }

@@ -9,6 +9,11 @@
     font-size: 1em;
 }
 
+.SearchForm-input, .SearchForm-button {
+    padding: 2px 5px;
+
+}
+
 .SearchForm-selectGrid {
     display: flex;
 }
@@ -18,6 +23,11 @@
     width: 100%;
     border: none;
     border-radius: 5px;
+}
+
+.SearchForm-searchBar {
+    width: 100%;
+    display: flex;
 }
 
 .SearchForm-input::placeholder {
@@ -36,7 +46,7 @@
     }
 
     .SearchForm-select, .SearchForm-input, .SearchForm-button {
-        margin: 1% 0;
+        margin: 1%;
     }
 }
 
