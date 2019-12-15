@@ -13,15 +13,13 @@ export default class AddIndex extends Component {
 
     getSpreadsheet = id => {
 
-        // Access current titleArray, sheetArray, and spreadArray.
-        const { spreadArray } = this.state;
         const sheetArray = [];
         // Create copies of all state arrays.
         var newDataArray = [];
         // Bind this as self.
         const self = this;
         // Temporary access token.
-        const accessToken = 'ya29.Il-1Byyki7T95-fqlhEeJtDIRliXEW4JFQLPcCN4t1gydj5RzeQ7_wV4pu3NofH8aqXEPWSjipgcmN-HlZYaNYYNC3758pbPtf-xZwNrqtM14iQmpmd-nZmmMQvcorwxyg';
+        const accessToken = 'ya29.Il-1Bx_DR3NpRMukuno-0NlcsIfs1Xu278gFWx0gBnpVhEWg3h3oilLq7ZriAdV3f5oy147uFfPWHqSCOM61zB4sg6Oj33wRNTrsPK-VQGhP-oCl0npgNS08xIXCNp0zZQ';
 
         axios({
 
@@ -208,16 +206,24 @@ export default class AddIndex extends Component {
         // Access current spreadArray.
         const { spreadArray } = this.state;
         // If spreadArray has any values map spreadArray else return.
-        if (spreadArray) {
+        if (spreadArray.length > 0) {
             // Iterate through array.
-            return spreadArray.map((data, i) => (
-                <li key={i}>
-                    {/* Button to remove listed item from Array */}
-                    <button onClick={() => this.removeFromArray(i)}>X</button>
-                    {/* Display data from each event */}
-                    <h3>{data.spreadsheetTitle}</h3>
-                </li>
-            ));
+            return <div className='AddIndex-data'>
+                <h2 className='AddIndex-header'>Spreadsheets</h2>
+                <ol className='AddIndex-list'>
+                    {spreadArray.map((data, i) => (
+                        <li className='AddIndex-item' key={i}>
+                            {/* Display data from each event */}
+                            <h3 className='AddIndex-itemTitle'>{data.spreadsheetTitle}</h3>
+                            {/* Button to remove listed item from Array */}
+                            <button 
+                                className='AddIndex-remove'
+                                onClick={() => this.removeFromArray(i)}
+                            >X</button>
+                        </li>
+                    ))}
+                </ol>
+            </div>
         } else return
     }
 
@@ -229,40 +235,48 @@ export default class AddIndex extends Component {
         const { getDataFromDB } = this.props;
         
         return(
-            <div className='Index'>
-                <label className='Index-addLabel'>Google Sheet:</label>
-                <input 
-                    id='Index-addText'
-                    type='text'
-                    placeholder='Enter Spreadsheet-ID'
-                    value={spreadId}
-                    onChange={event => {
-                        this.setState({ spreadId: event.target.value });
-                    }}
-                    onKeyPress={event => {
-                        if(event.key === 'Enter') {
-                            getDataFromDB();
-                            this.addToArray(spreadId);
-                            this.setState({ spreadId: '' });
-                        }
-                    }}
-                />
-                <button
-                    className='Index-addBtn'
-                    onClick={() => {
-                        getDataFromDB();
-                        this.addToArray(spreadId);
-                        this.setState({ spreadId: '' });
-                    }}
-                >Add</button>
-                <br />
-                <small><em>For Example: https://docs.google.com/spreadsheets/d/<b>Spreadsheet-ID</b>/edit#gid=0</em></small>
-                <ol>
-                    {this.displayArray()}
-                </ol>
-                <button
-                    onClick={() => this.postArray(spreadArray)}
-                >Submit</button>
+            <div className='AddIndex'>
+                <form className='AddIndex-form'>
+                    <label className='AddIndex-label'>Google Spreadsheet</label>
+                    <div className='AddIndex-inputs'>
+                        <input 
+                            className='AddIndex-text'
+                            type='text'
+                            placeholder='Enter ID'
+                            value={spreadId}
+                            onChange={event => {
+                                this.setState({ spreadId: event.target.value });
+                            }}
+                            onKeyPress={event => {
+                                event.preventDefault();
+                                if(event.key === 'Enter') {
+                                    getDataFromDB();
+                                    this.addToArray(spreadId);
+                                    this.setState({ spreadId: '' });
+                                }
+                            }}
+                        />
+                        <button
+                            className='AddIndex-btn'
+                            onClick={event => {
+                                event.preventDefault();
+                                getDataFromDB();
+                                this.addToArray(spreadId);
+                                this.setState({ spreadId: '' });
+                            }}
+                        >Add</button>
+                    </div>
+                </form>
+                <p className='AddIndex-example'>For Example: https://docs.google.com/spreadsheets/d/<b>Spreadsheet-ID</b>/edit#gid=0</p>
+                {this.displayArray()}
+                {spreadArray.length > 0 ? (
+                    <button
+                        className='AddIndex-post'
+                        onClick={() => this.postArray(spreadArray)}
+                    >Submit</button>
+                ) : (
+                    ''
+                )}
             </div>
         );
     }
