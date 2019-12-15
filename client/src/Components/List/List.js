@@ -21,6 +21,8 @@ class List extends Component {
     }
 
     renderUnordList(array) {
+
+        const { singleResult } = this.props;
     
         if (array.length > 0) {
             return <div className='List-personData'>
@@ -29,6 +31,7 @@ class List extends Component {
                     {array[0].personList.map((data, i) => {
                         return <Card 
                             key={i}
+                            singleResult={singleResult}
                             name={data.name}
                             phoneTag={data.phoneTag}
                             room={data.room}
@@ -61,7 +64,10 @@ class List extends Component {
 
             <div className='List'>
                 {display.length < 1 ? (
-                    <h1 className='List-defaultTitle'>CyberDex</h1>
+                    <div className='List-defaultTitle'>
+                        <h1 className='List-defaultOne'>Cyber</h1>
+                        <h1 className='List-defaultTwo'>Dex</h1>
+                    </div>
                 ) : (
                     <div className='List-renderList'>
                         <h1 className='List-sheetTitle'>{display[0].title}</h1>

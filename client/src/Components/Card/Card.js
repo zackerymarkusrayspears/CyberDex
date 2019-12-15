@@ -5,43 +5,41 @@ export default class Card extends Component {
 
     render() {
 
-        const { phoneTag, name, room, extension, phoneNumber, note, capitalize } = this.props;
-        return <li className='Card'>
+        const { singleResult, name, phoneTag, room, extension, phoneNumber, note, capitalize } = this.props;
+        const cardClass = singleResult ? 'Card Card-full' : 'Card';
+
+        return <li className={cardClass}>
             {name !== null ? (
-                <h3 className='Card-name'>{capitalize(name)}</h3>
+                <h3 className='Card-title'>{capitalize(name)}</h3>
             ) : (
                 ''
             )}
             <div className='Card-body'>
-                <div className='Card-bodyMain'>
-                    {phoneTag !== null ? (
-                        <h6 className='Card-phoneTag'>{`Phone Tag: ${capitalize(phoneTag)}`}</h6>
-                    ) : (
-                        ''
-                    )}
-                    {room !== null ? (
-                        <h6 className='Card-room'>{`Room: ${capitalize(room)}`}</h6>
-                    ) : (
-                        ''
-                    )}
-                    {extension !== null ? (
-                        <h6 className='Card-extension'>{`Extension: ${extension}`}</h6>
-                    ) : (
-                        ''
-                    )}
-                    {phoneNumber !== null ? (
-                        <h6 className='Card-phoneNumber'>{`Phone Number: ${phoneNumber}`}</h6>
-                    ) : (
-                        ''
-                    )}
-                </div>
-                <div className='Card-bodyNotes'>
-                    {note !== null ? (
-                        <p className='Card-note'>{`Note: ${capitalize(note)}`}</p>
-                    ) : (
-                        ''
-                    )}
-                </div>
+                {phoneTag !== null ? (
+                    <h4 className='Card-phoneTag'>{capitalize(phoneTag)}</h4>
+                ) : (
+                    ''
+                )}
+                {room !== null ? (
+                    <p className='Card-content'>{`Room: ${capitalize(room)}`}</p>
+                ) : (
+                    ''
+                )}
+                {extension !== null ? (
+                    <p className='Card-content'>{`Extension: ${extension}`}</p>
+                ) : (
+                    ''
+                )}
+                {phoneNumber !== null ? (
+                    <p className='Card-content'>{`Phone Number: ${phoneNumber}`}</p>
+                ) : (
+                    ''
+                )}
+                {note !== null ? (
+                    <small className='Card-content'>{`Note: ${capitalize(note)}`}</small>
+                ) : (
+                    ''
+                )}
             </div>
         </li>
     }

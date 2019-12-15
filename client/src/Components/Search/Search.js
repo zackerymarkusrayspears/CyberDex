@@ -10,7 +10,8 @@ export default class Search extends Component {
             district: '',
             school: '',
             searchInput: '',
-            display: []
+            display: [],
+            singleResult: false
         }
     }
 
@@ -81,7 +82,10 @@ export default class Search extends Component {
                     // Push newObject to newDisplay
                     newDisplay.push(newObject);
                     // Set display as neDisplay.
-                    return this.setState({display: newDisplay})
+                    return this.setState({
+                        display: newDisplay,
+                        singleResult: true
+                    })
                 }
             }
 
@@ -98,14 +102,17 @@ export default class Search extends Component {
             // Push newObject to newDisplay
             newDisplay.push(newObject);
             // Set display as neDisplay.
-            this.setState({display: newDisplay})
+            this.setState({
+                display: newDisplay,
+                singleResult: false
+            })
         }
     }
 
 
     render() {
 
-        const { district, school, searchInput, display } = this.state;
+        const { district, school, searchInput, display, singleResult } = this.state;
         const{ dbData } = this.props;
 
         return(
@@ -121,7 +128,7 @@ export default class Search extends Component {
                     handleSearch={this.handleSearch}
                     defaultInput={this.defaultInput}
                 />
-                <List display={display}/>
+                <List display={display} singleResult={singleResult}/>
             </div>
         );
     }
