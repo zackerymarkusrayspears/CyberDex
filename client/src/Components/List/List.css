@@ -4,29 +4,37 @@
     font-size: 3em;
 }
 
-.List-sheetTitle {
+.List-renderList {
     margin: 5% 0;
+    background-color: whitesmoke;
+    border: 1px solid wheat;
+    border-radius: 5px 5px 0 0;
+}
+
+.List-sheetTitle {
+    padding: 0 1%;
+    margin: 0;
     text-align: center;
-    font-size: 3em;
+    color: whitesmoke;
+    font-size: 2em;
+    word-wrap: break-word;
+    background-color: rgb(120, 0, 18);
+    border-bottom: 1px solid wheat;
+    border-radius: 5px 5px 0 0;
 }
 
 .List-metaData, .List-personData {
-    background-color: whitesmoke;
-    border: 1px solid wheat;
-    border-radius: 5px;
+    background-color: rgba(110, 110, 110, 0.1);
 }
 
 .List-metaData {
-    margin: 5% 10%;
+    padding-bottom: 2%;
 }
 
 .List-metaTitle, .List-personTitle {
     margin: 0;
-    padding: 0 1%;
-    color: whitesmoke;
-    background-color: #780012;
-    border-bottom: 1px solid wheat;
-    border-radius: 5px 5px 0 0;
+    padding-left: 3%;
+    color: rgb(120, 0, 18);
 }
 
 .List-metaList {
@@ -36,7 +44,8 @@
 }
 
 .List-metaItem {
-    margin: 5px 0;
+    margin: 0;
+    padding: 5px 0;
 }
 
 .List-personList {

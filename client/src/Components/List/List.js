@@ -63,10 +63,12 @@ class List extends Component {
                 {display.length < 1 ? (
                     <h1 className='List-defaultTitle'>CyberDex</h1>
                 ) : (
-                    <h1 className='List-sheetTitle'>{display[0].title}</h1>
+                    <div className='List-renderList'>
+                        <h1 className='List-sheetTitle'>{display[0].title}</h1>
+                        {this.renderMetaList(display)}
+                        {this.renderUnordList(display)}
+                    </div>
                 )}
-                {this.renderMetaList(display)}
-                {this.renderUnordList(display)}
             </div>
         );
     }
