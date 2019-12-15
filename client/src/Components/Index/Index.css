@@ -51,6 +51,9 @@
     margin-top: 0;
 }
 
-/* .Index-helpContent {
-    font-size: 0.75em;
-} */
+@media only screen and (max-width: 800px) {
+
+    .Index-help {
+        flex-wrap: wrap;
+    }
+}
