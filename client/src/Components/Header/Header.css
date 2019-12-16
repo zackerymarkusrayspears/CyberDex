@@ -1,19 +1,4 @@
-.App-header {
-    background-color: #282c34;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
-  }
-  
-  .App-link {
-    color: #61dafb;
-  }
-  
-  .Header-link1 {
+.Header-link1 {
     background-color: gold;
     border: none;
     color: white;
@@ -24,47 +9,47 @@
     font-size: 16px;
     -webkit-transition-duration: 1.0s; 
     transition-duration: 1.0s;
-  }
+}
 
-  .Header-link1:hover {
-      background-color: #780012;
-  }
+.Header-link1:hover {
+    background-color: #780012;
+}
 
-  .Header-link2 {
+.Header-link2 {
     background-color: gold;
     border: none;
     color: white;
     padding: 10.5px 45px;
-    float: right;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
     -webkit-transition-duration: 1.0s; 
     transition-duration: 1.0s;
-  }
+}
 
-  .Header-link2:hover {
+.Header-link2:hover {
     background-color: #780012;
 }
   
-  .Header {
-    min-height: 10vh;
+.Header {
+    min-height: 79px;
     background-color: #780012;
-  }
-  
-  .Header-navBar {
-    height: 10vh;
-  }
-  
-  .Header-navLinks {
+}
+
+.Header-navLinks {
     margin: 0;
     padding: 0;
     list-style: none;
-  }
+}
 
-  .BC-logo {
-      float: left;
-      height: 10vh;
-      width: 100px;
-  }
+.BC-logo {
+    float: left;
+    height: 79px;
+    width: 220px;
+}
+
+.Sign-in {
+    display: flex;
+    color: white;
+}
