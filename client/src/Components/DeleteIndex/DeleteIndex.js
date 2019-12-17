@@ -112,17 +112,25 @@ export default class DeleteIndex extends Component {
     render() {
 
         const { spreadArray } = this.state;
-
+        const { dbData } = this.props;
         return(
             <div className='DeleteIndex'>
-                <h3 className='DeleteIndex-summary'>Select Spreadsheet(s) to Remove:</h3>
+                {dbData.length > 0 ? (
+                    <h3 className='DeleteIndex-summary'>Select Spreadsheet(s) to Remove:</h3>
+                ) : (
+                    <h3 className='DeleteIndex-summary'>No Spreadsheets currently stored.</h3>
+                )}
                 <ol className='DeleteIndex-spreadList'>
                     {this.displayArray()}
                 </ol>
-                <button
-                    className='DeleteIndex-submitBtn'
-                    onClick={() => this.deleteFromDbData(spreadArray)}
-                >Submit</button>
+                {spreadArray.length > 0 ? (
+                    <button
+                        className='DeleteIndex-submitBtn'
+                        onClick={() => this.deleteFromDbData(spreadArray)}
+                    >Submit</button>
+                ) : (
+                    ''
+                )}
             </div>
 
         );

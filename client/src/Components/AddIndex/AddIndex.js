@@ -19,7 +19,7 @@ export default class AddIndex extends Component {
         // Bind this as self.
         const self = this;
         // Temporary access token.
-        const accessToken = 'ya29.Il-1Bx_DR3NpRMukuno-0NlcsIfs1Xu278gFWx0gBnpVhEWg3h3oilLq7ZriAdV3f5oy147uFfPWHqSCOM61zB4sg6Oj33wRNTrsPK-VQGhP-oCl0npgNS08xIXCNp0zZQ';
+        const accessToken = 'ya29.Il-1B8A9wX5-yumJZ19SgRS7jYBRaZDStux9NWiFP-7v9oaD7F3NUmEQ5EnAdvzEj-KmT6I99WXmYkVOA7Xn6n7_WS6s4zCA3PmzVIhlzTBn2hC9iUqwioR_ELuGICm4xA';
 
         axios({
 
@@ -119,7 +119,7 @@ export default class AddIndex extends Component {
         if (value === undefined || value === "") {
             return null
         } else {
-            return value.toLowerCase().trim();
+            return value.trim();
         }
     }
 

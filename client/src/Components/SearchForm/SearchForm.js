@@ -52,7 +52,7 @@ export default class SearchForm extends Component {
                     <input
                         className='SearchForm-input'
                         type='text'
-                        placeholder='Search For Teacher..'
+                        placeholder='Search by Name/Tag/Room/Extension'
                         value={searchInput}
                         onChange={event => changeInput(event)}
                         onKeyPress={event => {
