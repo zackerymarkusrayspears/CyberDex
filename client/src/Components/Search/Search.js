@@ -15,13 +15,6 @@ export default class Search extends Component {
         }
     }
 
-    defaultInput = () => {
-
-        this.setState({
-            searchInput: ''
-        });
-    }
-
     changeDistrict = event => {
 
         this.setState({
@@ -155,7 +148,6 @@ export default class Search extends Component {
                     changeSchool={this.changeSchool}
                     changeInput={this.changeInput}
                     handleSearch={this.handleSearch}
-                    defaultInput={this.defaultInput}
                 />
                 <List display={display} singleResult={singleResult}/>
             </div>
