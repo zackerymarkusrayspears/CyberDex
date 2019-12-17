@@ -14,10 +14,10 @@ export default function Header(props) {
                       <img className='nav-logo' src={logoImgSrc} alt="Barren County Logo"/>
                     </li>
                     <li className='nav-item'>
-                        <Link className='nav-link' to='/'>Home</Link>
+                        <Link className='nav-link' to='/'>Search</Link>
                     </li>
                     <li className='nav-item'>
-                        <Link className='nav-link' to='/index'>Index</Link>
+                        <Link className='nav-link' to='/index'>Edit</Link>
                     </li>
                 </ul>
             </div>
