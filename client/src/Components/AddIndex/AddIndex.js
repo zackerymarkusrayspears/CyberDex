@@ -19,7 +19,7 @@ export default class AddIndex extends Component {
         // Bind this as self.
         const self = this;
         // Temporary access token.
-        const accessToken = 'ya29.Il-1Bx_DR3NpRMukuno-0NlcsIfs1Xu278gFWx0gBnpVhEWg3h3oilLq7ZriAdV3f5oy147uFfPWHqSCOM61zB4sg6Oj33wRNTrsPK-VQGhP-oCl0npgNS08xIXCNp0zZQ';
+        const accessToken = 'ya29.Il-1BzK_qF8wtSAKBUj3FZOWTmRcOExkSDl-vlyq9FFScreJEvGuxBCre3oSPj2_aaka5aHgIjifgg13RwYLwxe1434ziHgecLQAVSDRrgRaUl2mmtfDKLiXtLI-ID3vtQ';
 
         axios({
 
@@ -119,15 +119,14 @@ export default class AddIndex extends Component {
         if (value === undefined || value === "") {
             return null
         } else {
-            return value.toLowerCase().trim();
+            return value.trim();
         }
     }
 
     postArray = array => {
-        console.log(array);
 
         // Access current dbArray.
-        const { dbData } = this.props;
+        const { getDataFromDB, dbData } = this.props;
         // For each spreadsheet object inside the array.
         array.forEach(spread => {
             // Create an id.
@@ -155,7 +154,8 @@ export default class AddIndex extends Component {
                 console.log(reponse);
                 this.setState({
                     spreadArray: []
-                })
+                });
+                getDataFromDB();
             }).catch((error) => {
                 console.log(error);
             });
@@ -250,7 +250,6 @@ export default class AddIndex extends Component {
                             onKeyPress={event => {
                                 event.preventDefault();
                                 if(event.key === 'Enter') {
-                                    getDataFromDB();
                                     this.addToArray(spreadId);
                                     this.setState({ spreadId: '' });
                                 }
@@ -260,7 +259,6 @@ export default class AddIndex extends Component {
                             className='AddIndex-btn'
                             onClick={event => {
                                 event.preventDefault();
-                                getDataFromDB();
                                 this.addToArray(spreadId);
                                 this.setState({ spreadId: '' });
                             }}

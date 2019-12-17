@@ -12,7 +12,7 @@ class List extends Component {
                 <ul className='List-metaList'>
                     {array[0].metaList.map((data, i) => {
                         return <li key={i}>
-                            <p className='List-metaItem'>{`- ${this.capitalize(data.line)}: ${data.number}`}</p>
+                            <p className='List-metaItem'>{`- ${data.line}: ${data.number}`}</p>
                         </li>
                     })}
                 </ul>
@@ -38,22 +38,11 @@ class List extends Component {
                             extension={data.extension}
                             phoneNumber={data.phoneNumber}
                             note={data.note}
-                            capitalize={this.capitalize}
                         />
                     })}
                 </ul>
             </div>
         }
-    }
-
-    capitalize = str => {
-
-        const strArray = str.split(' ');
-        var capitalizedArray = strArray.map(value => {
-            return value.charAt(0).toUpperCase() + value.slice(1)
-
-        });
-        return capitalizedArray.join(' ');
     }
 
     render() {

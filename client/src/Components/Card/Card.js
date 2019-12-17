@@ -5,23 +5,23 @@ export default class Card extends Component {
 
     render() {
 
-        const { singleResult, name, phoneTag, room, extension, phoneNumber, note, capitalize } = this.props;
+        const { singleResult, name, phoneTag, room, extension, phoneNumber, note } = this.props;
         const cardClass = singleResult ? 'Card Card-full' : 'Card';
 
         return <li className={cardClass}>
             {name !== null ? (
-                <h3 className='Card-title'>{capitalize(name)}</h3>
+                <h3 className='Card-title'>{name}</h3>
             ) : (
                 ''
             )}
             <div className='Card-body'>
                 {phoneTag !== null ? (
-                    <h4 className='Card-phoneTag'>{capitalize(phoneTag)}</h4>
+                    <h4 className='Card-phoneTag'>{phoneTag}</h4>
                 ) : (
                     ''
                 )}
                 {room !== null ? (
-                    <p className='Card-content'>{`Room: ${capitalize(room)}`}</p>
+                    <p className='Card-content'>{`Room: ${room}`}</p>
                 ) : (
                     ''
                 )}
@@ -36,7 +36,7 @@ export default class Card extends Component {
                     ''
                 )}
                 {note !== null ? (
-                    <small className='Card-content'>{`Note: ${capitalize(note)}`}</small>
+                    <small className='Card-content'>{`Note: ${note}`}</small>
                 ) : (
                     ''
                 )}
