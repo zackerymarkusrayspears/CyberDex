@@ -7,7 +7,7 @@ export default class Search extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            district: '',
+            district: '0',
             school: '',
             searchInput: '',
             display: [],
@@ -15,15 +15,15 @@ export default class Search extends Component {
         }
     }
 
-    changeDistrict = event => {
+    // changeDistrict = event => {
 
-        this.setState({
-            district: event.target.value,
-            school: '',
-            searchInput: '',
-            display: []
-        });
-    }
+    //     this.setState({
+    //         district: event.target.value,
+    //         school: '',
+    //         searchInput: '',
+    //         display: []
+    //     });
+    // }
 
     changeSchool = event => {
 

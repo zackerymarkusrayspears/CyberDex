@@ -3,14 +3,14 @@ import './SearchForm.css';
 
 export default class SearchForm extends Component {
 
-    addDistricts = array => {
+    // addDistricts = array => {
 
-        return array.map((data, i) => {
-            return <option key={i} value={i}>
-                {data.spreadsheetTitle}
-            </option>
-        });
-    }
+    //     return array.map((data, i) => {
+    //         return <option key={i} value={i}>
+    //             {data.spreadsheetTitle}
+    //         </option>
+    //     });
+    // }
 
     addSchools = district => {
 
@@ -28,7 +28,7 @@ export default class SearchForm extends Component {
 
         return (
             <form className='SearchForm'>
-                <select 
+                {/* <select 
                     className='SearchForm-select'
                     onChange={event => changeDistrict(event)}
                 >
@@ -37,7 +37,7 @@ export default class SearchForm extends Component {
                         value={''}
                     >District</option>
                     {this.addDistricts(dbData)}
-                </select>
+                </select> */}
                 <select 
                     className='SearchForm-select'
                     onChange={event => changeSchool(event)}
