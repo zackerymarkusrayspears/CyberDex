@@ -45,18 +45,7 @@ class App extends Component {
       <div className='App'>
         <Router>
             {/* Header - Navbar to navigate between Searching Database and Adding Data to Database(Index) */}
-            <Header>
-                <nav className='Header-navBar'>
-                    <ul className='Header-navLinks'>
-                    <li className='Listed-item'>
-                        <Link className='Header-link1' to='/'>Home</Link>
-                    </li>
-                    <li className='Listed-item'>
-                        <Link className='Header-link2' to='/index'>Index</Link>
-                    </li>
-                    </ul>
-                </nav>
-            </Header>
+            <Header/>
             {/* Switch to determine the path followed by clicked Link */}
             <Switch>
                 <Route exact path='/'>
