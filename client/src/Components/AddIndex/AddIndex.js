@@ -19,7 +19,7 @@ export default class AddIndex extends Component {
         // Bind this as self.
         const self = this;
         // Temporary access token.
-        const accessToken = 'ya29.Il-1B8A9wX5-yumJZ19SgRS7jYBRaZDStux9NWiFP-7v9oaD7F3NUmEQ5EnAdvzEj-KmT6I99WXmYkVOA7Xn6n7_WS6s4zCA3PmzVIhlzTBn2hC9iUqwioR_ELuGICm4xA';
+        const accessToken = 'ya29.Il-1BzK_qF8wtSAKBUj3FZOWTmRcOExkSDl-vlyq9FFScreJEvGuxBCre3oSPj2_aaka5aHgIjifgg13RwYLwxe1434ziHgecLQAVSDRrgRaUl2mmtfDKLiXtLI-ID3vtQ';
 
         axios({
 
@@ -124,10 +124,9 @@ export default class AddIndex extends Component {
     }
 
     postArray = array => {
-        console.log(array);
 
         // Access current dbArray.
-        const { dbData } = this.props;
+        const { getDataFromDB, dbData } = this.props;
         // For each spreadsheet object inside the array.
         array.forEach(spread => {
             // Create an id.
@@ -155,7 +154,8 @@ export default class AddIndex extends Component {
                 console.log(reponse);
                 this.setState({
                     spreadArray: []
-                })
+                });
+                getDataFromDB();
             }).catch((error) => {
                 console.log(error);
             });
@@ -250,7 +250,6 @@ export default class AddIndex extends Component {
                             onKeyPress={event => {
                                 event.preventDefault();
                                 if(event.key === 'Enter') {
-                                    getDataFromDB();
                                     this.addToArray(spreadId);
                                     this.setState({ spreadId: '' });
                                 }
@@ -260,7 +259,6 @@ export default class AddIndex extends Component {
                             className='AddIndex-btn'
                             onClick={event => {
                                 event.preventDefault();
-                                getDataFromDB();
                                 this.addToArray(spreadId);
                                 this.setState({ spreadId: '' });
                             }}

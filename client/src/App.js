@@ -60,7 +60,7 @@ class App extends Component {
             {/* Switch to determine the path followed by clicked Link */}
             <Switch>
                 <Route exact path='/'>
-                    <Search getDataFromDB={this.getDataFromDB} dbData={dbData} />
+                    <Search dbData={dbData} />
                 </Route>
                 <Route path='/index'>
                     <Index getDataFromDB={this.getDataFromDB} dbData={dbData} />

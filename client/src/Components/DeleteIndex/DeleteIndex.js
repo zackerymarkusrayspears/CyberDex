@@ -24,9 +24,9 @@ export default class DeleteIndex extends Component {
 
             }).then((response) => {
                 console.log(response);
+                getDataFromDB();
             }).catch((error) => {
                 console.log(error);
-                getDataFromDB();
             });
         });
     }
