@@ -42,16 +42,17 @@
     justify-content: center;
     align-items: center;
     padding: 10px;
-    color: gold;
+    color: rgb(255, 205, 0);
     text-decoration: none;
     -webkit-transition-duration: 1.0s; 
     transition-duration: 1.0s;
     margin-left: 10px;
+    
 }
 
 .nav-link:hover {
-    background-color: gold;
-    color: red;
+    background-color: rgb(255, 205, 0);
+    color: rgb(134, 31, 65);
 }
 
 /* .Header-link1 {
