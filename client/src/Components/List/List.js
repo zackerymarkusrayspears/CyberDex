@@ -2,47 +2,54 @@ import React, { Component } from 'react';
 import './List.css';
 import Card from '../Card/Card';
 
-class List extends Component {
+export default class List extends Component {
+
+    renderLists = array => {
+
+        return array.map((sheet, i) => {
+            return <div className='List-renderList' key={i}>
+                <h1 className='List-sheetTitle'>{sheet.title}</h1>
+                {this.renderMetaList(sheet.metaList)}
+                {this.renderPersonList(sheet.personList)}
+            </div>
+        });
+    }
 
     renderMetaList = array => {
 
-        if (array.length > 0) {
-            return <div className='List-metaData'>
-                <h2 className='List-metaTitle'>Lines</h2>
-                <ul className='List-metaList'>
-                    {array[0].metaList.map((data, i) => {
-                        return <li key={i}>
-                            <p className='List-metaItem'>{`- ${data.line}: ${data.number}`}</p>
-                        </li>
-                    })}
-                </ul>
-            </div>
-        }
+        return <div className='List-metaData'>
+            <h2 className='List-metaTitle'>Lines</h2>
+            <ul className='List-metaList'>
+                {array.map((item, i) => {
+                    return <li key={i}>
+                        <p className='List-metaItem'>{`- ${item.line}: ${item.number}`}</p>
+                    </li>
+                })}
+            </ul>
+        </div>
     }
 
-    renderUnordList(array) {
+    renderPersonList(array) {
 
         const { singleResult } = this.props;
-    
-        if (array.length > 0) {
-            return <div className='List-personData'>
-                <h2 className='List-personTitle'>Search Results</h2>
-                <ul className='List-personList'>
-                    {array[0].personList.map((data, i) => {
-                        return <Card 
-                            key={i}
-                            singleResult={singleResult}
-                            name={data.name}
-                            phoneTag={data.phoneTag}
-                            room={data.room}
-                            extension={data.extension}
-                            phoneNumber={data.phoneNumber}
-                            note={data.note}
-                        />
-                    })}
-                </ul>
-            </div>
-        }
+
+        return <div className='List-personData'>
+            <h2 className='List-personTitle'>Search Results</h2>
+            <ul className='List-personList'>
+                {array.map((item, i) => {
+                    return <Card 
+                        key={i}
+                        singleResult={singleResult}
+                        name={item.name}
+                        phoneTag={item.phoneTag}
+                        room={item.room}
+                        extension={item.extension}
+                        phoneNumber={item.phoneNumber}
+                        note={item.note}
+                    />
+                })}
+            </ul>
+        </div>
     }
 
     render() {
@@ -58,15 +65,9 @@ class List extends Component {
                         <h1 className='List-defaultTwo'>Dex</h1>
                     </div>
                 ) : (
-                    <div className='List-renderList'>
-                        <h1 className='List-sheetTitle'>{display[0].title}</h1>
-                        {this.renderMetaList(display)}
-                        {this.renderUnordList(display)}
-                    </div>
+                    this.renderLists(display)
                 )}
             </div>
         );
     }
 }
-
-export default List

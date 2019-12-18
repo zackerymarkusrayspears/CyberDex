@@ -3,15 +3,6 @@ import './SearchForm.css';
 
 export default class SearchForm extends Component {
 
-    // addDistricts = array => {
-
-    //     return array.map((data, i) => {
-    //         return <option key={i} value={i}>
-    //             {data.spreadsheetTitle}
-    //         </option>
-    //     });
-    // }
-
     addSchools = district => {
 
         if (district !== undefined) {
@@ -24,30 +15,10 @@ export default class SearchForm extends Component {
     }
 
     render() {
-        const { dbData, district, school, searchInput, changeDistrict, changeSchool, changeInput, handleSearch } = this.props;
+        const { searchInput, changeInput, iterateSearch } = this.props;
 
         return (
             <form className='SearchForm'>
-                {/* <select 
-                    className='SearchForm-select'
-                    onChange={event => changeDistrict(event)}
-                >
-                    <option 
-                        defaultValue
-                        value={''}
-                    >District</option>
-                    {this.addDistricts(dbData)}
-                </select> */}
-                <select 
-                    className='SearchForm-select'
-                    onChange={event => changeSchool(event)}
-                >
-                    <option 
-                        defaultValue
-                        value={''}
-                    >School</option>
-                    {this.addSchools(dbData[district])}
-                </select>
                 <div className='SearchForm-searchBar'>
                     <input
                         className='SearchForm-input'
@@ -58,7 +29,7 @@ export default class SearchForm extends Component {
                         onKeyPress={event => {
                             if (event.key === 'Enter') {
                                 event.preventDefault();
-                                handleSearch(school, searchInput);
+                                iterateSearch();
                             }
                         }}
                     />
@@ -66,7 +37,7 @@ export default class SearchForm extends Component {
                         className = "SearchForm-button"
                         onClick={event => {
                             event.preventDefault();
-                            handleSearch(school, searchInput);
+                            iterateSearch();
                         }}
                     >Submit</button>
                 </div>
