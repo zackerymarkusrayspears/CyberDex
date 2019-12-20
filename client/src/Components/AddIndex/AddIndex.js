@@ -19,7 +19,7 @@ export default class AddIndex extends Component {
         // Bind this as self.
         const self = this;
         // Temporary access token.
-        const accessToken = 'ya29.Il-1BzK_qF8wtSAKBUj3FZOWTmRcOExkSDl-vlyq9FFScreJEvGuxBCre3oSPj2_aaka5aHgIjifgg13RwYLwxe1434ziHgecLQAVSDRrgRaUl2mmtfDKLiXtLI-ID3vtQ';
+        const accessToken = 'ya29.Il-2B_wqYKekOJq706pZs6I8GvZTE6P-ftd6J4B9mcSUBQ2RbThjBk5TXYdkb_bjyRsnkVe8ZuxdrbBo_qR6OC3fofv1VA7d9Y2ox0g9v0e2ynVKBeEAB6ScmD_t1ne0Ug';
 
         axios({
 
@@ -231,8 +231,6 @@ export default class AddIndex extends Component {
 
         // Access current spreadId and spreadArray.
         const { spreadId, spreadArray } = this.state;
-        // Access getDataFromDB function to keep current dbData fresh.
-        const { getDataFromDB } = this.props;
         
         return(
             <div className='AddIndex'>
@@ -248,8 +246,8 @@ export default class AddIndex extends Component {
                                 this.setState({ spreadId: event.target.value });
                             }}
                             onKeyPress={event => {
-                                event.preventDefault();
                                 if(event.key === 'Enter') {
+                                    event.preventDefault();
                                     this.addToArray(spreadId);
                                     this.setState({ spreadId: '' });
                                 }
