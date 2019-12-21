@@ -24,9 +24,9 @@ export default class DeleteIndex extends Component {
 
             }).then((response) => {
                 console.log(response);
+                getDataFromDB();
             }).catch((error) => {
                 console.log(error);
-                getDataFromDB();
             });
         });
     }
@@ -83,9 +83,10 @@ export default class DeleteIndex extends Component {
         const { dbData } = this.props;
         // Return a listed item for each object inside the current dbData array.
         return dbData.map((data, index) => {
-            return <li key={index}>
+            return <li key={index} className='DeleteIndex-ordItem'>
                 {/* Button to add item listed to spreadArray. */}
                 <button 
+                className='DeleteIndex-removeBtn'
                     onClick={() => {
                         if (this.checkArray(index)) {
                             this.addToArray(index)
@@ -94,13 +95,13 @@ export default class DeleteIndex extends Component {
                         }
                     }}>Remove</button>
                 {/* Display data from each event. */}
-                <h3>{data.spreadsheetTitle}</h3>
-                <h6>Sheets:</h6>
-                <ul>
+                <h3 className='DeleteIndex-spreadTitle'>{data.spreadsheetTitle}</h3>
+                <h6 className='DeleteIndex-sheets'>Sheets:</h6>
+                <ul className='DeleteIndex-sheetList'>
                     {/* Return a listed item for each object inside the sheet array of data. */}
                     {data.sheet.map((sheet, i) => {
-                        return <li key={i}>
-                            <small>{sheet.title}</small>
+                        return <li key={i} className='DeleteIndex-unordItem'>
+                            <small className='DeleteIndex-sheetTitle'>{sheet.title}</small>
                         </li>
                     })}
                 </ul>
@@ -111,16 +112,25 @@ export default class DeleteIndex extends Component {
     render() {
 
         const { spreadArray } = this.state;
-
+        const { dbData } = this.props;
         return(
             <div className='DeleteIndex'>
-                <h3>Select Spreadsheet(s) to Remove:</h3>
-                <ol>
+                {dbData.length > 0 ? (
+                    <h3 className='DeleteIndex-summary'>Select Spreadsheet(s) to Remove:</h3>
+                ) : (
+                    <h3 className='DeleteIndex-summary'>No Spreadsheets currently stored.</h3>
+                )}
+                <ol className='DeleteIndex-spreadList'>
                     {this.displayArray()}
                 </ol>
-                <button
-                    onClick={() => this.deleteFromDbData(spreadArray)}
-                >Submit</button>
+                {spreadArray.length > 0 ? (
+                    <button
+                        className='DeleteIndex-submitBtn'
+                        onClick={() => this.deleteFromDbData(spreadArray)}
+                    >Submit</button>
+                ) : (
+                    ''
+                )}
             </div>
 
         );

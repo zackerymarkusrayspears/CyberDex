@@ -13,15 +13,13 @@ export default class AddIndex extends Component {
 
     getSpreadsheet = id => {
 
-        // Access current titleArray, sheetArray, and spreadArray.
-        const { spreadArray } = this.state;
         const sheetArray = [];
         // Create copies of all state arrays.
-        var newDataArray = spreadArray;
+        var newDataArray = [];
         // Bind this as self.
         const self = this;
         // Temporary access token.
-        const accessToken = 'ya29.Il-0B8rSJrkaAruZrNqSCJ08F0QYCW_CAg_rDljj76VcK5KVD9GSOWwj-BtOJFj9tJ65Ug9uBjAJsOLGSE7bQxvW_DRLmXVcrSpHE5CcEKW7x1XsXVG2UVifUtMLwxW-lg';
+        const accessToken = 'ya29.Il-2B_wqYKekOJq706pZs6I8GvZTE6P-ftd6J4B9mcSUBQ2RbThjBk5TXYdkb_bjyRsnkVe8ZuxdrbBo_qR6OC3fofv1VA7d9Y2ox0g9v0e2ynVKBeEAB6ScmD_t1ne0Ug';
 
         axios({
 
@@ -35,6 +33,9 @@ export default class AddIndex extends Component {
             for (var index = 0; index < response.data.sheets.length; index++ ) {
                 const sheet = response.data.sheets[index], title = sheet.properties.title, metaArray = [], personArray = [];
 
+                var sheetsLength = response.data.sheets.length;
+                var spreadsheetTitle = response.data.properties.title;
+                
                 axios({
 
                     method: 'GET',
@@ -72,31 +73,39 @@ export default class AddIndex extends Component {
                         // Push personObject to personArray for every row.
                         personArray.push(personObject);
                     }
+                    var newTitle = prompt(`Name sheet title for "${title}"`)
                     // Push sheet's title, metaArray and personArray as an object into sheetArray.
                     sheetArray.push({
-                        title: title,
+                        title: newTitle,
                         value: {
                             metaData: metaArray,
                             personData: personArray
                         }
                     });
-                    
+
+                    if (index === sheetsLength) {
+
+                        newDataArray = [];
+
+                        // Create variable getObject to store spreadsheet data.
+                        var spreadObject = {
+                            spreadsheetId: id,
+                            spreadsheetTitle: spreadsheetTitle,
+                            sheet: sheetArray
+                        };
+                        // Push getObject to newDataArray.
+                        newDataArray.push(spreadObject);
+                        // Update spreadTitleArray with newDataArray.
+                        self.setState({ 
+                            spreadArray: newDataArray
+                        });
+
+                        console.log(newDataArray);
+                    }
                 }).catch((error) => {
                     console.log(error);
                 });
             }
-            // Create variable getObject to store spreadsheet data.
-            var spreadObject = {
-                spreadsheetId: id,
-                spreadsheetTitle: response.data.properties.title,
-                sheet: sheetArray
-            };
-            // Push getObject to newDataArray.
-            newDataArray.push(spreadObject);
-            // Update spreadTitleArray with newDataArray.
-            self.setState({ 
-                spreadArray: newDataArray
-            });
 
         }).catch((error) => {
             alert(`Error: SpreadsheetID: ${id} not found.`);
@@ -115,10 +124,9 @@ export default class AddIndex extends Component {
     }
 
     postArray = array => {
-        console.log(array);
 
         // Access current dbArray.
-        const { dbData } = this.props;
+        const { getDataFromDB, dbData } = this.props;
         // For each spreadsheet object inside the array.
         array.forEach(spread => {
             // Create an id.
@@ -146,7 +154,8 @@ export default class AddIndex extends Component {
                 console.log(reponse);
                 this.setState({
                     spreadArray: []
-                })
+                });
+                getDataFromDB();
             }).catch((error) => {
                 console.log(error);
             });
@@ -197,16 +206,24 @@ export default class AddIndex extends Component {
         // Access current spreadArray.
         const { spreadArray } = this.state;
         // If spreadArray has any values map spreadArray else return.
-        if (spreadArray) {
+        if (spreadArray.length > 0) {
             // Iterate through array.
-            return spreadArray.map((data, i) => (
-                <li key={i}>
-                    {/* Button to remove listed item from Array */}
-                    <button onClick={() => this.removeFromArray(i)}>X</button>
-                    {/* Display data from each event */}
-                    <h3>{data.spreadsheetTitle}</h3>
-                </li>
-            ));
+            return <div className='AddIndex-data'>
+                <h2 className='AddIndex-header'>Spreadsheets</h2>
+                <ol className='AddIndex-list'>
+                    {spreadArray.map((data, i) => (
+                        <li className='AddIndex-item' key={i}>
+                            {/* Display data from each event */}
+                            <h3 className='AddIndex-itemTitle'>{data.spreadsheetTitle}</h3>
+                            {/* Button to remove listed item from Array */}
+                            <button 
+                                className='AddIndex-remove'
+                                onClick={() => this.removeFromArray(i)}
+                            >X</button>
+                        </li>
+                    ))}
+                </ol>
+            </div>
         } else return
     }
 
@@ -214,44 +231,48 @@ export default class AddIndex extends Component {
 
         // Access current spreadId and spreadArray.
         const { spreadId, spreadArray } = this.state;
-        // Access getDataFromDB function to keep current dbData fresh.
-        const { getDataFromDB } = this.props;
         
         return(
-            <div className='Index'>
-                <label className='Index-addLabel'>Google Sheet:</label>
-                <input 
-                    id='Index-addText'
-                    type='text'
-                    placeholder='Enter Spreadsheet-ID'
-                    value={spreadId}
-                    onChange={event => {
-                        this.setState({ spreadId: event.target.value });
-                    }}
-                    onKeyPress={event => {
-                        if(event.key === 'Enter') {
-                            getDataFromDB();
-                            this.addToArray(spreadId);
-                            this.setState({ spreadId: '' });
-                        }
-                    }}
-                />
-                <button
-                    className='Index-addBtn'
-                    onClick={() => {
-                        getDataFromDB();
-                        this.addToArray(spreadId);
-                        this.setState({ spreadId: '' });
-                    }}
-                >Add</button>
-                <br />
-                <small><em>For Example: https://docs.google.com/spreadsheets/d/<b>Spreadsheet-ID</b>/edit#gid=0</em></small>
-                <ol>
-                    {this.displayArray()}
-                </ol>
-                <button
-                    onClick={() => this.postArray(spreadArray)}
-                >Submit</button>
+            <div className='AddIndex'>
+                <form className='AddIndex-form'>
+                    <label className='AddIndex-label'>Google Spreadsheet</label>
+                    <div className='AddIndex-inputs'>
+                        <input 
+                            className='AddIndex-text'
+                            type='text'
+                            placeholder='Enter ID'
+                            value={spreadId}
+                            onChange={event => {
+                                this.setState({ spreadId: event.target.value });
+                            }}
+                            onKeyPress={event => {
+                                if(event.key === 'Enter') {
+                                    event.preventDefault();
+                                    this.addToArray(spreadId);
+                                    this.setState({ spreadId: '' });
+                                }
+                            }}
+                        />
+                        <button
+                            className='AddIndex-btn'
+                            onClick={event => {
+                                event.preventDefault();
+                                this.addToArray(spreadId);
+                                this.setState({ spreadId: '' });
+                            }}
+                        >Add</button>
+                    </div>
+                </form>
+                <p className='AddIndex-example'>For Example: https://docs.google.com/spreadsheets/d/<b>Spreadsheet-ID</b>/edit#gid=0</p>
+                {this.displayArray()}
+                {spreadArray.length > 0 ? (
+                    <button
+                        className='AddIndex-post'
+                        onClick={() => this.postArray(spreadArray)}
+                    >Submit</button>
+                ) : (
+                    ''
+                )}
             </div>
         );
     }

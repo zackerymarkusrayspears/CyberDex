@@ -3,31 +3,65 @@
 }
 
 .SearchForm-select, .SearchForm-input, .SearchForm-button {
+    padding: 0 2px;
     background-color: black;
-    color: white;
-    font-size: 12pt;
+    color: whitesmoke;
+    font-size: 1em;
+}
+
+.SearchForm-input, .SearchForm-button {
+    padding: 2px 5px;
+
 }
 
 .SearchForm-selectGrid {
-    display: grid;
-    grid-template-columns: auto auto;
-    grid-gap: 5px;
+    display: flex;
 }
 
 .SearchForm-input {
     background-color: black;
-    margin-left: 5px;
     width: 100%;
-    overflow: hidden;
-    /* text-align: center; */
+    border: none;
+    border-radius: 5px;
+}
+
+.SearchForm-searchBar {
+    width: 100%;
+    display: flex;
 }
 
 .SearchForm-input::placeholder {
-    color: white;
+    color: whitesmoke;
 }
 
 .SearchForm-button {
-    color: white;
+    color: whitesmoke;
     background-color: black;
-    margin-left: 5px;
+    border: none;
+    border-radius: 5px;
+}
+
+.SearchForm-button:hover {
+    color: black;
+    background-color: gold;
+}
+
+@media only screen and (max-width: 600px) {
+    .SearchForm, .SearchForm-selectGrid {
+        flex-direction: column;
+    }
+
+    .SearchForm-select, .SearchForm-input, .SearchForm-button {
+        margin: 1%;
+    }
+}
+
+@media only screen and (min-width: 601px) {
+    .SearchForm-select, .SearchForm-input {
+        margin-right: 1%;
+    }
+
+    .SearchForm-input {
+        overflow: hidden;
+    }
 }

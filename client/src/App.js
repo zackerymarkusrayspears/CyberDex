@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import './App.css';
-import {
+import {  
   BrowserRouter as Router,
   Switch,
   Route,
@@ -25,7 +25,7 @@ class App extends Component {
   }
 
   getDataFromDB = () => {
-    console.log('getDataFromDB')
+    
     axios({
       url: 'http://localhost:3001/api/getData',
       method: 'GET'
@@ -45,22 +45,11 @@ class App extends Component {
       <div className='App'>
         <Router>
             {/* Header - Navbar to navigate between Searching Database and Adding Data to Database(Index) */}
-            <Header>
-                <nav className='Header-navBar'>
-                    <ul className='Header-navLinks'>
-                    <li className='Listed-item'>
-                        <Link className='Header-link' to='/search'>Search</Link>
-                    </li>
-                    <li className='Listed-item'>
-                        <Link className='Header-link' to='/index'>Index</Link>
-                    </li>
-                    </ul>
-                </nav>
-            </Header>
+            <Header/>
             {/* Switch to determine the path followed by clicked Link */}
             <Switch>
-                <Route exact path='/search'>
-                  <Search getDataFromDB={this.getDataFromDB} dbData={dbData} />
+                <Route exact path='/'>
+                    <Search dbData={dbData} />
                 </Route>
                 <Route path='/index'>
                     <Index getDataFromDB={this.getDataFromDB} dbData={dbData} />
