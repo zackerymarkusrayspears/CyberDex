@@ -5,7 +5,7 @@
 .SearchForm-select, .SearchForm-input, .SearchForm-button {
     padding: 0 2px;
     background-color: black;
-    color: whitesmoke;
+    color: white;
     font-size: 1em;
 }
 
@@ -31,19 +31,21 @@
 }
 
 .SearchForm-input::placeholder {
-    color: whitesmoke;
+    color: white;
 }
 
 .SearchForm-button {
-    color: whitesmoke;
+    color: white;
     background-color: black;
     border: none;
     border-radius: 5px;
+    -webkit-transition-duration: 1.0s; 
+    transition-duration: 1.0s;
 }
 
 .SearchForm-button:hover {
     color: black;
-    background-color: gold;
+    background-color: rgb(255, 205, 0);
 }
 
 @media only screen and (max-width: 600px) {
