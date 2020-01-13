@@ -132,7 +132,6 @@ export default class DeleteIndex extends Component {
                     ''
                 )}
             </div>
-
         );
     }
 }

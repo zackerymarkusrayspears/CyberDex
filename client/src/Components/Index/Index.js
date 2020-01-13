@@ -7,6 +7,7 @@ import {
   Link
 } from 'react-router-dom'
 import AddIndex from '../AddIndex/AddIndex';
+import UpdateIndex from '../UpdateIndex/UpdateIndex';
 import DeleteIndex from '../DeleteIndex/DeleteIndex';
 
 export default class Index extends Component {
@@ -22,6 +23,9 @@ export default class Index extends Component {
                                 <Link className='Index-link' to='/index'>Add</Link>
                             </li>
                             <li className='Index-navItem'>
+                                <Link className='Index-link' to='/index/update'>Update</Link>
+                            </li>
+                            <li className='Index-navItem'>
                                 <Link className='Index-link' to='/index/delete'>Delete</Link>
                             </li>
                         </ul>
@@ -29,6 +33,9 @@ export default class Index extends Component {
                     <Switch>
                         <Route exact path='/index'>
                             <AddIndex getDataFromDB={getDataFromDB} dbData={dbData} />
+                        </Route>
+                        <Route path='/index/update'>
+                            <UpdateIndex getDataFromDB={getDataFromDB} dbData={dbData} />
                         </Route>
                         <Route path='/index/delete'>
                             <DeleteIndex getDataFromDB={getDataFromDB} dbData={dbData} />
