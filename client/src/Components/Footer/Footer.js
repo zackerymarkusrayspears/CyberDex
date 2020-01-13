@@ -6,7 +6,8 @@ export default class Footer extends Component {
     render() {
         return (
             <footer className='Footer'>
-                <div className='FooterLeft'>
+                
+                    <div className='FooterLeft'>
                     <h4 className="footer-school-information">Barren County Schools</h4>
                     <h5 className="footer-school-information">507 Trojan Trail</h5>
                     <h5 className="footer-school-information">Glasgow, KY 42141</h5>
@@ -24,6 +25,7 @@ export default class Footer extends Component {
                     <h6 className="footer-school-information">As required by law, the District does not discriminate on the basis of race, color, national origin, sex, genetic information, disability, age, or limitations related to pregnancy, childbirth, or related medical conditions in its programs and activities and provides equal access to its facilities to the Boy Scouts and other designated youth groups.. </h6>
 
                 </div>
+                
             </footer>
         );
     }
