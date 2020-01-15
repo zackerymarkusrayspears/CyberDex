@@ -17,7 +17,7 @@ export default class UpdateIndex extends Component {
 
         return (
             <div>
-                <select
+                <select className='selector'
                 value={this.state.spreadSelected}
                     onChange={event => {
                         this.setState({

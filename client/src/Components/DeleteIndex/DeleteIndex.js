@@ -96,7 +96,7 @@ export default class DeleteIndex extends Component {
                     }}>Remove</button>
                 {/* Display data from each event. */}
                 <h3 className='DeleteIndex-spreadTitle'>{data.spreadsheetTitle}</h3>
-                <h6 className='DeleteIndex-sheets'>Sheets:</h6>
+                <h6 className='DeleteIndex-sheets'>Sheets</h6>
                 <ul className='DeleteIndex-sheetList'>
                     {/* Return a listed item for each object inside the sheet array of data. */}
                     {data.sheet.map((sheet, i) => {

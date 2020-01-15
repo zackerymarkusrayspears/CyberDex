@@ -11,6 +11,7 @@
     font-size: 1em;
     color: whitesmoke;
     background: linear-gradient(to right, rgba(0, 0, 0, 0.95) ,rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.95));
+    text-align: center;
 }
 
 .DeleteIndex-sheetList {
@@ -74,4 +75,6 @@
     color: black;
     background-color: gold;
     cursor: pointer;
+    -webkit-transition-duration: 1.5s; 
+    transition-duration: 1.5s;
 }
