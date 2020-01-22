@@ -63,27 +63,49 @@ router.post('/postData', (req, res) => {
     let newData = new Data();
 
     // Pull the ID and message from the body of the request.
-    const { id, spreadsheetId, spreadsheetTitle, sheet} = req.body;
-
-    // If ID does not have a value and is not equal to 0 or if the any body variable doesn't have a value, return an error.
-    if ((!id && id !== 0) || (!spreadsheetId || !spreadsheetTitle || !sheet)) {
-        return res.json({
-            success: false,
-            error: 'INVALID INPUT'
-        })
-    }
+    const { id, title, sheet, account, record } = req.body;
 
     // Configure the Schema object.
     newData.id = id;
-    newData.spreadsheetId = spreadsheetId;
-    newData.spreadsheetTitle = spreadsheetTitle;
+    newData.title = title;
     newData.sheet = sheet;
+    newData.account = account;
+    newData.record = record;
 
     // To save to the database.
     newData.save(err => {
         if (err) {
            return res.json({ success: false, error: err }); 
         } else return res.json({ success: true });
+    });
+});
+
+router.put('/updateData', (req, res) => {
+
+    // Pull the ID and message from the body of the request.
+    const { id, title, sheet, account, record } = req.body;
+
+    Data.findOne({ id: id }, (error, doc) => {
+        if (error) {
+            return res.json({ success: false, error: error });
+        }
+
+        let newData = doc;
+
+        // Configure the Schema object.
+        newData.id = id;
+        newData.title = title;
+        newData.sheet = sheet;
+        newData.account = account;
+        newData.record = record;
+    
+        Data.replaceOne({ _id: doc._id }, newData, err => {
+            if (err) {
+                return res.json({ success: false, error: err });
+            } else {
+                return res.json({ success: true });
+            }
+        });
     });
 });
 

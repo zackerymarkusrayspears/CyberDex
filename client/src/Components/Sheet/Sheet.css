@@ -1,0 +1,13 @@
+.sheet {
+    margin-top: 30px;
+}
+
+.sheet-modify {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.sheet-modify-btn {
+    margin-left: 10px !important;
+}

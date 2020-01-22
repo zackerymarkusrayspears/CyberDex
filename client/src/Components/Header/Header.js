@@ -1,33 +1,64 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom'
+import React from 'react';
 import './Header.css';
+import { Link } from 'react-router-dom';
 
 export default function Header(props) {
-    const { children } = props;
-    const logoImgSrc = "https://www.barren.k12.ky.us/docs/district/brand%20images/district%20logo/we%20are%20bc%201%20burgundy%20filled%20white%20font.png?id=85394";
 
-    return(
-        <nav className="header">
-            <div className="left-nav nav-menu">
-                <ul className="nav-item-list">
-                    <li className="nav-logo">
-                      <img className='nav-logo' src={logoImgSrc} alt="Barren County Logo"/>
-                    </li>
-                    <li className='nav-item'>
-                        <Link className='nav-link' to='/'>Search</Link>
-                    </li>
-                    <li className='nav-item'>
-                        <Link className='nav-link' to='/index'>Edit</Link>
+    return <div className='header'>
+        <nav className="header-top">
+            <div className="header-top-left">
+                <ul className="header-top-list">
+                    <li className='header-top-item'>
+                        <Link 
+                            className='header-top-link' 
+                            to='/'
+                        >CyberDex</Link>
                     </li>
                 </ul>
             </div>
-            {/* <div className="right-nav nav-menu">
-                <ul class="nav-item-list">
-                    <li className='nav-item'>
-                        <Link className='nav-link' to='#'>Sign In</Link>
-                    </li>
-                </ul>
-            </div> */}
         </nav>
-    );
+        <nav className='header-btm'>
+            <ul className='header-btm-list'>
+                {props.account === '' ? (
+                    <li className='header-btm-item'>
+                        <Link
+                            className='header-btm-link'
+                            to='/account'
+                        >Log in</Link>
+                    </li>
+                ) : (
+                    <>
+                        <li className='header-btm-item'>
+                            <Link
+                                className='header-btm-link'
+                                to='/account'
+                            >Account</Link>
+                        </li>
+                        {props.account.type === 'admin' ? (
+                            <>
+                                <li className='header-btm-item'>
+                                    <Link 
+                                        className='header-btm-link'
+                                        to='/edit'
+                                    >Edit</Link>
+                                </li>
+                                <li className='header-btm-item'>
+                                    <Link 
+                                        className='header-btm-link'
+                                        to='/history'
+                                    >History</Link>
+                                </li>
+                            </>
+                        ) : null }
+                        <li className='header-btm-item'>
+                            <a 
+                                className='header-btm-link'
+                                onClick={() => props.renderAccount('', '')}
+                            >Log out</a>
+                        </li>
+                    </>
+                )}
+            </ul>
+        </nav>
+    </div>
 }

@@ -1,4 +1,12 @@
-.Search {
-    min-height: 90vh;
-    margin: 5%;
+.search {
+    display: flex;
+}
+
+.search-text {
+    width: 100%;
+    overflow: hidden;
+}
+
+.search-btn {
+    margin-left: 10px !important;
 }

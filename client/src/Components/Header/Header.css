@@ -1,4 +1,5 @@
-.header {
+.header-top {
+    height: 92px;
     background-color: #780012;
     border: none;
     color: white;
@@ -12,32 +13,23 @@
     transition-duration: 1.0s;
 }
 
-.nav-logo {
-    height: 60px;
-    width: auto;
-}
-
-.left-nav {
+.header-top-left {
     float: left;
 }
 
-.right-nav {
-    float: right;
-}
-
-.nav-item-list {
+.header-top-list {
     list-style: none;
     display: flex;
 }
 
-.nav-item {
+.header-top-item {
     width: 80px;
     height: 60px;
     text-align: center;
     display: flex;
 }
 
-.nav-link {
+.header-top-link {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -50,66 +42,37 @@
     
 }
 
-.nav-link:hover {
+.header-top-link:hover {
     background-color: rgb(255, 205, 0);
     color: rgb(134, 31, 65);
 }
 
-/* .Header-link1 {
-    background-color: rgb(119, 119, 119);
-    border: none;
-    color: white;
-    padding: 11px 43px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    height: 57px;
-    font-size: 16px;
-    -webkit-transition-duration: 1.0s; 
-    transition-duration: 1.0s;
-    float: left;
+.header-btm {
+    width: 100vw;
+    min-width: 550px;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.95) ,rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.95));
 }
 
-.Header-link1:hover {
-    background-color: gold;
-}
-
-.Header-link2 {
-    background-color: rgb(119, 119, 119);
-    border: none;
-    color: white;
-    padding: 10.5px 45px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    height: 58px;
-    font-size: 16px;
-    -webkit-transition-duration: 1.0s; 
-    transition-duration: 1.0s;
-}
-
-.Header-link2:hover {
-    background-color: gold;
-}
-  
-.Header {
-    min-height: 79px;
-    background-color: #780012;
-}
-
-.Header-navLinks {
+.header-btm-list {
     margin: 0;
-    padding: 0;
+    padding: 5px 0;
+    display: flex;
+    justify-content: center;
     list-style: none;
 }
 
-.BC-logo {
-    float: left;
-    height: 79px;
-    width: 220px;
+.header-btm-item {
+    margin: 0 5px;
 }
 
-.Sign-in {
-    display: flex;
-    color: white;
-} */
+.header-btm-link {
+    padding: 2px 5px;
+    color: whitesmoke;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.header-btm-link:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
