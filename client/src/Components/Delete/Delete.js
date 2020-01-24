@@ -53,28 +53,27 @@ export default class Delete extends Component {
     deleteSheet() {
 
         // Access current dbArray.
-        const { account, dbData, getDataFromDB } = this.props,
+        const { account, dbSpread, dbAccount, postSpread } = this.props,
             { sheetArray } = this.state,
-            newSheetArray = [],
-            recordArray = dbData.record;
+            newSheetArray = [];
 
         let sheetStr = '',
             newLog = '';
 
-        dbData.sheet.forEach((sheet, i) => {
+        dbSpread.sheet.forEach((sheet, i) => {
             if (!sheetArray.includes(i)) newSheetArray.push(sheet);
         });
 
-        if (sheetArray.length === dbData.sheet.length) {
+        if (sheetArray.length === dbSpread.sheet.length) {
             newLog = `Removed all sheets from CyberDex.`
         } else {
             sheetArray.forEach((num, i) => {
-                if (sheetArray.length === 1) return sheetStr = dbData.sheet[num].title;
+                if (sheetArray.length === 1) return sheetStr = dbSpread.sheet[num].title;
 
                 if (i !== sheetArray.length - 1) {
-                    sheetStr += `${dbData.sheet[num].title}, `
+                    sheetStr += `${dbSpread.sheet[num].title}, `
                 } else {
-                    sheetStr += `and ${dbData.sheet[num].title}`
+                    sheetStr += `and ${dbSpread.sheet[num].title}`
                 }
             });
             newLog = `Removed sheet(s) ${sheetStr} from CyberDex.`
@@ -90,46 +89,25 @@ export default class Delete extends Component {
             timestamp: Date()
         }
 
-        recordArray.unshift(newRecord);
-
         // Axios request to post the new id number and data from spreadsheet object.
         axios({
 
             url: 'http://localhost:3001/api/updateData',
             method: 'PUT',
             data: {
-                id: dbData.id,
-                title: dbData.title,
+                id: dbSpread.id,
+                title: dbSpread.title,
                 sheet: newSheetArray,
-                account: dbData.account,
-                record: recordArray
+                account: dbAccount,
+                record: newRecord
             }
 
         }).then((reponse) => {
             console.log(reponse);
-            getDataFromDB();
-            dbData.sheet.forEach((sheet, i) => {
+            postSpread();
+            dbSpread.sheet.forEach((sheet, i) => {
                 this.renderSheetArray(i, false)
             })
-        }).catch((error) => {
-            console.log(error);
-        });
-    }
-
-    deleteCyberDex() {
-
-        // Axios request to post the new id number and data from spreadsheet object.
-        axios({
-
-            url: 'http://localhost:3001/api/deleteData',
-            method: 'DELETE',
-            data: {
-                id: 0,
-            }
-
-        }).then((reponse) => {
-            console.log(reponse);
-            this.props.getDataFromDB();
         }).catch((error) => {
             console.log(error);
         });
@@ -138,11 +116,11 @@ export default class Delete extends Component {
     render() {
 
         const { sheetArray } = this.state;
-        const { dbData } = this.props;
+        const { dbSpread } = this.props;
 
         return(
             <div className='delete'>
-                {dbData.sheet.length !== 0 ? (
+                {dbSpread.sheet.length !== 0 ? (
                     <>
                         <h3 className='delete-summary'>Select sheet(s) to remove:</h3>
                         {sheetArray.length > 0 ? (
@@ -156,12 +134,12 @@ export default class Delete extends Component {
                             <Table>
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>{dbData.title}</TableCell>
-                                        {sheetArray.length !== dbData.sheet.length ? (
+                                        <TableCell>{dbSpread.title}</TableCell>
+                                        {sheetArray.length !== dbSpread.sheet.length ? (
                                             <TableCell align='right'>
                                                 <Button 
                                                     onClick={() => {
-                                                        dbData.sheet.forEach((sheet, i) => {
+                                                        dbSpread.sheet.forEach((sheet, i) => {
                                                             this.renderSheetArray(i, true)
                                                         })
                                                     }}
@@ -172,7 +150,7 @@ export default class Delete extends Component {
                                             <TableCell align='right'>
                                                 <Button 
                                                     onClick={() => {
-                                                        dbData.sheet.forEach((sheet, i) => {
+                                                        dbSpread.sheet.forEach((sheet, i) => {
                                                             this.renderSheetArray(i, false)
                                                         })
                                                     }}
@@ -182,10 +160,10 @@ export default class Delete extends Component {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {dbData.sheet.map((sheet, i) => {
+                                    {dbSpread.sheet.map((sheet, i) => {
                                         return <TableRow key={`tr-${i}`}>
                                             <TableCell>{sheet.title}</TableCell>
-                                            {(sheetArray.length === dbData.sheet.length || sheetArray.length === 0) ? (
+                                            {(sheetArray.length === dbSpread.sheet.length || sheetArray.length === 0) ? (
                                                 <TableCell align='right'>
                                                     <Button 
                                                         onClick={() => {
@@ -211,9 +189,6 @@ export default class Delete extends Component {
                 ) : (
                     <h3 className='delete-summary'>No sheets currently stored.</h3>
                 )}
-                {/* <Button
-                    onClick={() => this.deleteCyberDex()}
-                >Delete extras</Button> */}
             </div>
         );
     }

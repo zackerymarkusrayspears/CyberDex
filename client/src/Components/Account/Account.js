@@ -1,24 +1,21 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import './Account.css';
 import AccountTable from '../AccountTable/AccountTable';
-import { 
-    TextField,
-    Button
-} from '@material-ui/core';
+import { Button } from '@material-ui/core';
 
 export default class Account extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: '',
-            password: '',
+            loading: false,
             editMode: false,
-            accountData: [],
+            accountId: this.props.dbAccId,
+            accountData: this.props.dbAccount,
+            addAccount: [],
             deleteAccount: [],
             lockAccount: [],
             unlockAccount: [],
-            title: this.props.dbData.title,
+            title: this.props.dbSpread.title,
             editTitle: '',
             editAccount: '',
             editUsername: '',
@@ -51,39 +48,35 @@ export default class Account extends Component {
     }
 
     componentDidMount() {
-        this.renderAccountData();
-    }
-
-    renderAccountData() {
-        const { account, dbData } = this.props;
-        const array = [];
-        dbData.account.forEach(acc => {
-            if (account.id === acc.id) return
-            if (acc.type === 'admin') array.unshift(acc);
-            if (acc.type === 'user') array.push(acc);
+        const { dbAccId, dbAccount } = this.props,
+            display = [];
+        dbAccount.forEach(acc => display.push(acc));
+        this.setState({
+            accountId: dbAccId,
+            accountData: display
         });
-        array.unshift(account);
-        this.setState({ accountData: array });
     }
 
     renderRowAuth(array) {
-        const { dbData } = this.props;
+        const { dbSpread } = this.props;
         let titleStr = '';
-        if (array.includes('lock')) return 'Locked'
-        if (dbData.length === 0 || array.includes('none')) return 'None'
-        if (array.includes('full')) return 'Full'
-        dbData.sheet.forEach(sheet => {
-            array.forEach(num => {
-                if (num === sheet.id) {
-                    titleStr = sheet.title
-                }
+        if (array) {
+            if (array.includes('lock')) return 'Locked'
+            if (array.includes('none')) return 'None'
+            if (array.includes('full')) return 'Full'
+            dbSpread.sheet.forEach(sheet => {
+                array.forEach(num => {
+                    if (num === sheet.id) {
+                        titleStr = sheet.title
+                    }
+                });
             });
-        });
-        return titleStr;
+            return titleStr;
+        }
     }
 
     toggleLock(row, acc) {
-        const array = this.state.accountData,
+        const display = this.state.accountData,
             lockArray = this.state.lockAccount,
             unlockArray = this.state.unlockAccount,
             dataAuth = acc.auth;
@@ -96,21 +89,21 @@ export default class Account extends Component {
             dataAuth.splice(dataAuth.indexOf('lock'), 1);
             lockArray.splice(lockArray.indexOf(acc.username), 1);
             unlockArray.push(acc.username);
-
         }
 
         let newData = {
             id: acc.id,
+            spreadId: acc.spreadId,
             username: acc.username,
             password: acc.password,
             name: acc.name,
             auth: dataAuth,
             type: acc.type
         };
-        array.splice(row, 1, newData);
+        display.splice(row, 1, newData);
 
         this.setState({ 
-            accountData: array,
+            accountData: display,
             lockAccount: lockArray,
             unlockAccount: unlockArray
         });
@@ -133,20 +126,31 @@ export default class Account extends Component {
     }
     
     editAccountRow(row, username, name, auth, type) {
+        let accUsername = '',
+            accName = '';
+        if (username !== null) accUsername = username;
+        if (name !== null) accName = name;
         this.setState({ 
             editAccount: row,
-            editUsername: username,
-            editName: name,
+            editUsername: accUsername,
+            editName: accName,
             editAuth: auth,
             editType: type
         });
     }
 
     removeAccountRow(row, username) {
-        const display = this.state.accountData;
-        const array = this.state.deleteAccount;
+        const { dbAccount } = this.props,
+            { accountData, addAccount, deleteAccount } = this.state,
+            display = accountData,
+            array = deleteAccount;
+        let addToArray = false;
         display.splice(row, 1);
-        array.push(username);
+        dbAccount.forEach(acc => {
+            if (acc.username === username) addToArray = true;
+        });
+        if (addToArray) array.push(username);
+        if (addAccount.includes(username)) addAccount.splice(addAccount.indexOf(username), 1);
         this.setState({ 
             accountData: display,
             deleteAccount: array 
@@ -158,7 +162,8 @@ export default class Account extends Component {
     handleEditAuth(event) { this.setState({ editAuth: event }); }
 
     replaceAccountRow(row, acc) {
-        const array = this.state.accountData, { editUsername, editName, editAuth, editType } = this.state;
+        const { accountData, editUsername, editName, editAuth, editType } = this.state,
+            display = accountData;
 
         let dataName = null;
 
@@ -166,16 +171,17 @@ export default class Account extends Component {
 
         let newData = {
             id: acc.id,
+            spreadId: acc.spreadId,
             username: editUsername.trim(),
             password: acc.password,
             name: dataName,
             auth: editAuth,
             type: editType
         };
-        array.splice(row, 1, newData);
+        display.splice(row, 1, newData);
 
         this.setState({ 
-            accountData: array,
+            accountData: display,
             editAccount: ''
         });
     }
@@ -188,26 +194,30 @@ export default class Account extends Component {
     handleNewType(event) { this.setState({ newType: event }); }
 
     addAccountRow() {
-        const { dbData } = this.props,
-            { newUsername, newName, newAuth, newType } = this.state,
-            array = this.state.accountData;
+        const { dbSpread } = this.props,
+            { accountId, accountData, addAccount, newUsername, newName, newAuth, newType } = this.state,
+            display = accountData, array = addAccount;
 
         let idArray = [],
+            usernameTaken = false,
             dataId = 1,
             dataName = null;
 
         if (newName.trim() !== '') dataName = newName.trim();
 
-        dbData.account.forEach(account => idArray.push(account.id));
+        accountId.forEach(id => idArray.push(id));
 
-        array.forEach(account => {
-            if (!idArray.includes(account.id)) idArray.push(account.id);
+        display.forEach(acc => {
+            if (!idArray.includes(acc.id)) idArray.push(acc.id);
+            if (newUsername.trim() === acc.username) usernameTaken = true;
         });
+        if (usernameTaken) return alert('Username taken.');
 
         while (idArray.includes(dataId)) dataId++;
 
         const newData = {
             id: dataId,
+            spreadId: dbSpread.id,
             username: newUsername.trim(),
             password: newUsername.trim(),
             name: dataName,
@@ -216,13 +226,15 @@ export default class Account extends Component {
         }
 
         if (newType === 'admin') {
-            array.splice(1, 0, newData);
+            display.splice(1, 0, newData);
         } else {
-            array.push(newData);
+            display.push(newData);
         }
+        array.push(newUsername.trim());
 
         this.setState({ 
-            metaData: array, 
+            accountData: display, 
+            addAccount: array,
             newUsername: '',
             newName: '',
             newAuth: 'none',
@@ -240,9 +252,8 @@ export default class Account extends Component {
     }
 
     checkModification() {
-        const { account, dbData } = this.props,
-            { accountData, deleteAccount, lockAccount, unlockAccount, title } = this.state,
-            idArray = [];
+        const { account, dbSpread, putAccount } = this.props,
+            { accountData, addAccount, deleteAccount, lockAccount, unlockAccount, title } = this.state;
 
         let titleStr = '',
             lockStr = '',
@@ -252,53 +263,8 @@ export default class Account extends Component {
             deleteStr = '',
             addStr = '';
 
-        if (dbData.title !== title) titleStr = `changed Title from "${dbData.title}" to "${title}".`
-        if (account.username !== accountData[0].username) usernameStr = `changed Username from "${account.username}" to "${accountData[0].username}".`;
-        if (account.name !== accountData[0].name) nameStr = `changed Name from "${account.name}" to "${accountData[0].name}".`;
+        if (dbSpread.title !== title) titleStr = `changed Title from "${dbSpread.title}" to "${title}".`
 
-        dbData.account.forEach((acc, i) => {
-            if (!deleteAccount.includes(acc.username)) {
-                accountData.forEach(res => {
-                    if (acc.id === res.id) {
-                        idArray.push(acc.id);
-                    }
-                });
-            } 
-        });
-        accountData.forEach((acc, i) => {
-            if (!idArray.includes(acc.id)) {
-                switch (i) {
-                    case (accountData.length - idArray.length):
-                        addStr += `"${acc.username}"`;
-                        break;
-                    case ((accountData.length - idArray.length) - 1):
-                        addStr += `"${acc.username}", and `;
-                        break;
-                    case 1:
-                        if ((accountData.length - idArray.length) === 2) addStr += `"${acc.username}" and `;
-                        if ((accountData.length - idArray.length) > 2) addStr += `"${acc.username}", `;
-                        break;
-                    default:
-                        addStr += `"${acc.username}", `;
-                }
-            }
-        });
-        deleteAccount.forEach((username, i) => {
-            switch (i) {
-                case (deleteAccount.length - 1):
-                    deleteStr += `"${username}"`;
-                    break;
-                case (deleteAccount.length - 2):
-                    deleteStr += `"${username}", and `;
-                    break;
-                case 1:
-                    if (deleteAccount.length === 2) deleteStr += `"${username}" and `;
-                    if (deleteAccount.length > 2) deleteStr += `"${username}", `;
-                    break;
-                default:
-                    deleteStr += `"${username}", `;
-            }
-        });
         lockAccount.forEach((username, i) => {
             switch (i) {
                 case (lockAccount.length - 1):
@@ -331,96 +297,52 @@ export default class Account extends Component {
                     unlockStr += `"${username}", `;
             }
         });
-
-
-        if (titleStr === '' && lockStr === '' && unlockStr === '' && usernameStr === '' && nameStr === '' && deleteStr === '' && addStr === '') {
-            this.renderAccountData();
-            return alert('No modifications were made to CyberDex.');
-        }
-        this.modifyAccount(titleStr, lockStr, unlockStr, usernameStr, nameStr, deleteStr, addStr);
-    }
-
-    modifyAccount(titleStr, lockStr, unlockStr, usernameStr, nameStr, deleteStr, addStr) {
-        // console.log(titleStr);
-        // console.log(lockStr);
-        // console.log(usernameStr);
-        // console.log(nameStr);
-        // console.log(deleteStr);
-        // console.log(addStr);
-
-        const { account, dbData, getDataFromDB } = this.props,
-            { accountData, title } = this.state,
-            recordArray = dbData.record;
-        
-        let newLog = 'Account ';
-        
-        if (account.name === '') return alert('Account does not have a name.');
-
-        if (titleStr !== '') newLog += titleStr;
-        if (lockStr !== '') {
-            if (newLog !== 'Account ') newLog += '  Account ';
-            newLog += `locked ${lockStr} account(s).`;
-        }
-        if (unlockStr !== '') {
-            if (newLog !== 'Account ') newLog += '  Account ';
-            newLog += `unlocked ${unlockStr} account(s).`;
-        }
-        if (deleteStr !== '') {
-            if (newLog !== 'Account ') newLog += '  Account ';
-            newLog += `deleted ${deleteStr} account(s).`;
-        }
-        if (addStr !== '') {
-            if (newLog !== 'Account ') newLog += '  Account ';
-            newLog += `added ${addStr} account(s).`;
-        }
-        if (usernameStr !== '') {
-            if (newLog !== 'Account ') newLog += '  Account ';
-            newLog += usernameStr;
-        }
-        if (nameStr !== '') {
-            if (newLog !== 'Account ') newLog += '  Account ';
-            newLog += nameStr;
-        }
-
-        const newRecord = {
-            id: account.id,
-            name: account.name,
-            log: newLog,
-            type: 'account',
-            timestamp: Date()
-        }
-
-        console.log(newRecord);
-
-        recordArray.unshift(newRecord);
-
-        axios({
-
-            url: 'http://localhost:3001/api/updateData',
-            method: 'PUT',
-            data: {
-                id: dbData.id,
-                title: title,
-                sheet: dbData.sheet,
-                account: accountData,
-                record: recordArray
+        addAccount.forEach((username, i) => {
+            switch (i) {
+                case (addAccount.length - 1):
+                    addStr += `"${username}"`;
+                    break;
+                case (addAccount.length - 2):
+                    addStr += `"${username}", and `;
+                    break;
+                case 1:
+                    if (addAccount.length === 2) addStr += `"${username}" and `;
+                    if (addAccount.length > 2) addStr += `"${username}", `;
+                    break;
+                default:
+                    addStr += `"${username}", `;
             }
-
-        }).then((reponse) => {
-            console.log(reponse);
-            getDataFromDB();
-            this.setState({ editMode: false });
-        }).catch((error) => {
-            console.log(error);
         });
+        deleteAccount.forEach((username, i) => {
+            switch (i) {
+                case (deleteAccount.length - 1):
+                    deleteStr += `"${username}"`;
+                    break;
+                case (deleteAccount.length - 2):
+                    deleteStr += `"${username}", and `;
+                    break;
+                case 1:
+                    if (deleteAccount.length === 2) deleteStr += `"${username}" and `;
+                    if (deleteAccount.length > 2) deleteStr += `"${username}", `;
+                    break;
+                default:
+                    deleteStr += `"${username}", `;
+            }
+        });
+
+        if (account.username !== accountData[0].username) usernameStr = `changed Username from "${account.username}" to "${accountData[0].username}".`;
+        if (account.name !== accountData[0].name) nameStr = `changed Name from "${account.name}" to "${accountData[0].name}".`;
+
+        if (titleStr === '' && lockStr === '' && unlockStr === '' && deleteStr === '' && addStr === '' && usernameStr === '' && nameStr === '' ) return alert('No modifications were made to CyberDex.');
+
+        putAccount(accountData, title, titleStr, lockStr, unlockStr, deleteStr, addStr, usernameStr, nameStr);
     }
 
     render() {
 
-        const { account, dbData, renderAccount } = this.props;
+        const { account, dbSpread, dbAccount } = this.props;
         const { 
-            username, 
-            password, 
+            loading,
             editMode, 
             accountData, 
             title, 
@@ -436,100 +358,70 @@ export default class Account extends Component {
             newType
         } = this.state;
 
-        return account === '' ? (
-            <div className='account-login'>
-                <TextField
-                    value={username}
-                    onChange={event => this.setState({ username: event.target.value })}
-                    label='Username'
-                    onKeyPress={event => {
-                        if(event.key === 'Enter') {
-                            event.preventDefault();
-                            renderAccount(username, password);
-                        }
-                    }}
-                />
-                <TextField
-                    value={password}
-                    onChange={event => {
-                        this.setState({ password: event.target.value })
-                    }}
-                    label='Password'
-                    onKeyPress={event => {
-                        if(event.key === 'Enter') {
-                            event.preventDefault();
-                            renderAccount(username, password);
-                            this.renderAccountData();
-                        }
-                    }}
-                />
-                <Button
-                    onClick={() => {
-                        renderAccount(username, password);
-                        this.renderAccountData();
-                    }}
-                >Log in</Button>
-            </div>
-        ) : (
-            <div className='account'>
-                <div className='account-modify'>
-                    {!editMode ? (
-                        <Button
-                            onClick={() => this.setState({ editMode: true })}
-                        >Edit</Button>
-                    ) : (
-                        <>
+        return <div className='account'>
+            {!loading ? (
+                <>
+                    <div className='account-modify'>
+                        {!editMode ? (
                             <Button
-                                onClick={() => {
-                                    this.checkModification();
-                                    this.setState({ editMode: false });
+                                onClick={() => this.setState({ editMode: true })}
+                            >Edit</Button>
+                        ) : (
+                            <>
+                                <Button
+                                    onClick={() => {
+                                        this.checkModification();
+                                        this.setState({ editMode: false });
+                                    }}
+                                >Save</Button>
+                                <Button
+                                    onClick={() => {
+                                        this.setState({ 
+                                            editMode: false,
+                                            accountData: dbAccount
+                                        });
                                 }}
-                            >Save</Button>
-                            <Button
-                                onClick={() => {
-                                    this.renderAccountData();
-                                    this.setState({ editMode: false });
-                            }}
-                            >Return</Button>
-                        </>
-                    )}
-                </div>
-                <AccountTable
-                    dbData={dbData}
-                    account={account}
-                    editMode={editMode}
-                    accountData={accountData}
-                    title={title}
-                    editTitle={editTitle}
-                    editAccount={editAccount}
-                    editUsername={editUsername}
-                    editName={editName}
-                    editAuth={editAuth}
-                    editType={editType}
-                    newUsername={newUsername}
-                    newName={newName}
-                    newAuth={newAuth}
-                    newType={newType}
-                    renderRowAuth={this.renderRowAuth}
-                    toggleLock={this.toggleLock}
-                    editSpreadTitle={this.editSpreadTitle}
-                    handleSpreadTitle={this.handleSpreadTitle}
-                    replaceSpreadTitle={this.replaceSpreadTitle}
-                    editAccountRow={this.editAccountRow}
-                    removeAccountRow={this.removeAccountRow}
-                    handleEditUsername={this.handleEditUsername}
-                    handleEditName={this.handleEditName}
-                    handleEditAuth={this.handleEditAuth}
-                    replaceAccountRow={this.replaceAccountRow}
-                    returnAccountRow={this.returnAccountRow}
-                    handleNewUsername={this.handleNewUsername}
-                    handleNewName={this.handleNewName}
-                    handleNewAuth={this.handleNewAuth}
-                    handleNewType={this.handleNewType}
-                    addAccountRow={this.addAccountRow}
-                    clearAccountRow={this.clearAccountRow}
-                />
-            </div>
-        )
+                                >Return</Button>
+                            </>
+                        )}
+                    </div>
+                    <AccountTable
+                        dbSpread={dbSpread}
+                        account={account}
+                        editMode={editMode}
+                        accountData={accountData}
+                        title={title}
+                        editTitle={editTitle}
+                        editAccount={editAccount}
+                        editUsername={editUsername}
+                        editName={editName}
+                        editAuth={editAuth}
+                        editType={editType}
+                        newUsername={newUsername}
+                        newName={newName}
+                        newAuth={newAuth}
+                        newType={newType}
+                        renderRowAuth={this.renderRowAuth}
+                        toggleLock={this.toggleLock}
+                        editSpreadTitle={this.editSpreadTitle}
+                        handleSpreadTitle={this.handleSpreadTitle}
+                        replaceSpreadTitle={this.replaceSpreadTitle}
+                        editAccountRow={this.editAccountRow}
+                        removeAccountRow={this.removeAccountRow}
+                        handleEditUsername={this.handleEditUsername}
+                        handleEditName={this.handleEditName}
+                        handleEditAuth={this.handleEditAuth}
+                        replaceAccountRow={this.replaceAccountRow}
+                        returnAccountRow={this.returnAccountRow}
+                        handleNewUsername={this.handleNewUsername}
+                        handleNewName={this.handleNewName}
+                        handleNewAuth={this.handleNewAuth}
+                        handleNewType={this.handleNewType}
+                        addAccountRow={this.addAccountRow}
+                        clearAccountRow={this.clearAccountRow}
+                    />
+                </>
+            ) : null }
+        </div>
     }
 }

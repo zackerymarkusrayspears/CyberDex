@@ -11,24 +11,27 @@ export default class Main extends Component {
             display: [],
             editMode: ''
         }
+        this.changeInput = this.changeInput.bind(this);
+        this.iterateSearch = this.iterateSearch.bind(this);
+        this.handleSearch = this.handleSearch.bind(this);
         this.resetDisplay = this.resetDisplay.bind(this);
         this.setEditMode = this.setEditMode.bind(this);
     }
 
-    changeInput = event => {
+    changeInput(event) {
         this.setState({
             display: [],
             searchInput: event.target.value
         });
     }
 
-    iterateSearch = () => {
+    iterateSearch() {
 
-        const { dbData } = this.props, { searchInput, display } = this.state;
+        const { dbSpread } = this.props, { searchInput, display } = this.state;
         const self = this, input = searchInput.trim().toLowerCase(), inputArray = input.split(' ');
         let sheetIdArray = [], sheetTitleArray = [];
 
-        dbData.sheet.forEach(sheet => {
+        dbSpread.sheet.forEach(sheet => {
             sheetTitleArray = sheet.title.toLowerCase().split(' ');
             sheetTitleArray.forEach(titleWord => {
                 if (inputArray.includes(titleWord)) {
@@ -38,7 +41,7 @@ export default class Main extends Component {
             });
         });
 
-        dbData.sheet.forEach((sheet, i) => {
+        dbSpread.sheet.forEach((sheet, i) => {
             if (sheetIdArray.length === 0) {
                 self.handleSearch(sheet, inputArray);
             } else if (sheetIdArray.includes(sheet.id)) {
@@ -49,7 +52,7 @@ export default class Main extends Component {
         if (display.length < 1) alert(`Error: "${searchInput}" is not found.`);
     }
 
-    handleSearch = (sheet, inputArray) => {
+    handleSearch(sheet, inputArray) {
 
         const newDisplay = this.state.display,
             newMetaList = [],
@@ -148,12 +151,12 @@ export default class Main extends Component {
     render() {
 
         const { searchInput, display, editMode } = this.state;
-        const { account, dbData, getDataFromDB } = this.props;
+        const { account, dbSpread, postSpread } = this.props;
 
         return(
             <div className='main'>
                 <Search
-                    dbData={dbData}
+                    dbSpread={dbSpread}
                     searchInput={searchInput}
                     changeInput={this.changeInput}
                     iterateSearch={this.iterateSearch}
@@ -163,8 +166,8 @@ export default class Main extends Component {
                         return <Sheet 
                             key={`sheet-${i}`}
                             account={account}
-                            dbData={dbData}
-                            getDataFromDB={getDataFromDB}
+                            dbSpread={dbSpread}
+                            postSpread={postSpread}
                             data={data}
                             editMode={editMode}
                             setEditMode={this.setEditMode}

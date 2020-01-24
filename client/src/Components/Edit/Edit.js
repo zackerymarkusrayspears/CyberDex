@@ -13,19 +13,21 @@ export default class Edit extends Component {
 
     render() {
 
-        const { account, dbData, getDataFromDB, usedIds } = this.props;
+        const { account, dbId, dbSpread, dbAccount, postSpread } = this.props;
 
         return <div className='edit'>
             <Add
                 account={account}
-                dbData={dbData}
-                getDataFromDB={getDataFromDB} 
-                usedIds={usedIds}
+                dbId={dbId}
+                dbSpread={dbSpread}
+                dbAccount={dbAccount}
+                postSpread={postSpread} 
             />
             <Delete 
                 account={account}
-                dbData={dbData}
-                getDataFromDB={getDataFromDB}
+                dbSpread={dbSpread}
+                dbAccount={dbAccount}
+                postSpread={postSpread}
             />
             <div className='edit-help'>
                 <div className='edit-help-div'>

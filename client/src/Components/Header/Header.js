@@ -10,7 +10,8 @@ export default function Header(props) {
                 <ul className="header-top-list">
                     <li className='header-top-item'>
                         <Link 
-                            className='header-top-link' 
+                            className='header-top-link'
+                            onClick={() => props.handleDisplay('main')}
                             to='/'
                         >CyberDex</Link>
                     </li>
@@ -19,12 +20,12 @@ export default function Header(props) {
         </nav>
         <nav className='header-btm'>
             <ul className='header-btm-list'>
-                {props.account === '' ? (
+                {props.account.username === '' ? (
                     <li className='header-btm-item'>
-                        <Link
+                        <a
                             className='header-btm-link'
-                            to='/account'
-                        >Log in</Link>
+                            onClick={() => props.handleDisplay('login')}
+                        >Log in</a>
                     </li>
                 ) : (
                     <>
@@ -51,10 +52,11 @@ export default function Header(props) {
                             </>
                         ) : null }
                         <li className='header-btm-item'>
-                            <a 
+                            <Link
                                 className='header-btm-link'
-                                onClick={() => props.renderAccount('', '')}
-                            >Log out</a>
+                                onClick={() => props.handleLogOut()}
+                                to='/'
+                            >Log out</Link>
                         </li>
                     </>
                 )}

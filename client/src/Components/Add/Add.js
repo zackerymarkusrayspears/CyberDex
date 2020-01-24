@@ -25,12 +25,12 @@ export default class Add extends Component {
 
     addGoogleSheet = () => {
 
-        const { dbData } = this.props;
+        const { dbSpread } = this.props;
 
         let data = false;
 
         // Check if any id exists in dbData.
-        if (dbData.sheet.length !== 0) {
+        if (dbSpread.sheet.length !== 0) {
             data = true;
             this.setState({ existingData: true });
         }
@@ -206,14 +206,13 @@ export default class Add extends Component {
     addSheet() {
 
         // Access current dbArray.
-        const { account, usedIds, dbData, getDataFromDB } = this.props,
-            { existingData, getSheet } = this.state,
-            recordArray = dbData.record;
+        const { account, dbId, dbSpread, dbAccount, postSpread } = this.props,
+            { existingData, getSheet } = this.state;
             
         let newLog = '';
 
         if (existingData) {
-            newLog = `Replaced ${dbData.title} with ${getSheet.title}.`
+            newLog = `Replaced ${dbSpread.title} with ${getSheet.title}.`
         } else {
             newLog = `Added ${getSheet.title}.`
         }
@@ -228,12 +227,10 @@ export default class Add extends Component {
             timestamp: Date()
         }
 
-        recordArray.unshift(newRecord);
-
         // Create an id.
         let idToBeAdded = 1;
         // While the created id is equal to an existing id, increment the id.
-        while (usedIds.includes(idToBeAdded)) {
+        while (dbId.includes(idToBeAdded)) {
             idToBeAdded++;
         }
 
@@ -243,21 +240,21 @@ export default class Add extends Component {
             url: 'http://localhost:3001/api/updateData',
             method: 'PUT',
             data: {
-                id: dbData.id,
+                id: dbSpread.id,
                 title: getSheet.title,
                 sheet: getSheet.sheet,
-                account: dbData.account,
-                record: recordArray
+                account: dbAccount,
+                record: newRecord
             }
 
         }).then((reponse) => {
             console.log(reponse);
+            postSpread();
             this.setState({
                 spreadId: '',
                 existingData: false,
                 getSheet: ''
             });
-            getDataFromDB();
         }).catch((error) => {
             console.log(error);
         });
@@ -265,7 +262,7 @@ export default class Add extends Component {
 
     render() {
 
-        const { dbData } = this.props;
+        const { dbSpread } = this.props;
         const { spreadId, getSheet } = this.state;
         
         return(
@@ -284,7 +281,7 @@ export default class Add extends Component {
                             }
                         }}
                     />
-                    {dbData.sheet.length > 0 ? (
+                    {dbSpread.sheet.length > 0 ? (
                         <Button
                             onClick={event => {
                                 event.preventDefault();

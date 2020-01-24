@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import './History.css';
 import TableContainer from '@material-ui/core/TableContainer';
 import Table from '@material-ui/core/Table';
@@ -17,7 +18,8 @@ export default class History extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            display: [],
+            loading: true,
+            record: [],
             filterUser: 'all',
             filterType: 'all',
             filterAmount: 15,
@@ -27,16 +29,18 @@ export default class History extends Component {
     }
 
     componentDidMount() {
-        this.renderRecord();
+        this.setState({
+            loading: false,
+            record: this.props.dbRecord
+        })
     }
 
     renderRecord(argUser, argType, argAmount, argIndex, argPage) {
 
-        const { dbData } = this.props;
+        const { account } = this.props;
         const { filterUser, filterType, filterAmount, currentIndex, currentPage } = this.state;
 
-        let newDisplay = [],
-            user = filterUser,
+        let user = filterUser,
             type = filterType,
             amount = filterAmount,
             index = currentIndex,
@@ -48,140 +52,146 @@ export default class History extends Component {
         if (argIndex !== index && argIndex !== undefined) index = argIndex;
         if (argPage !== page && argPage !== undefined) page = argPage;
 
-        for (var i = index; newDisplay.length < amount; i++) {
-            if (user === dbData.record[i].id || user === 'all') {
-                if (type === dbData.record[i].type || type === 'all') {
-                    newDisplay.push(dbData.record[i]);
-                }
+        this.setState({ loading: true });
+
+        axios({
+            url: 'http://localhost:3001/api/postHistory',
+            method: 'POST',
+            data: {
+                id: account.spreadId,
+                user: user,
+                type: type,
+                amount: amount,
+                index: index
             }
-            if (i === dbData.record.length - 1) return this.setState({ 
-                display: newDisplay,
+        }).then(response => {
+            if (!response.data.success) {
+              this.setState({ loading: false });
+              return alert(response.data.message);
+            }
+            this.setState({ 
+                loading: false,
+                record: response.data.data,
                 filterUser: user,
                 filterType: type,
                 filterAmount: amount,
                 currentIndex: index,
                 currentPage: page
             });
-        }
-        this.setState({ 
-            display: newDisplay,
-            filterUser: user,
-            filterType: type,
-            filterAmount: amount,
-            currentIndex: index,
-            currentPage: page
+        }).catch(error => {
+            console.log(error);
+            this.setState({ loading: false });
         });
-    }
-
-    renderDisplay() {
-
-        const { display } = this.state;
-
-        if (display.length !== 0) {
-            return display.map((record, i) => {
-                return <TableRow key={`tr-${i}`}>
-                    <TableCell>{record.name}</TableCell>
-                    <TableCell>{record.log}</TableCell>
-                    <TableCell align='right'>{record.timestamp.substring(0, 24)}</TableCell>
-                </TableRow>
-            })
-        } else {
-            return <TableRow>
-                <TableCell colSpan={3}>No Records</TableCell>
-            </TableRow>
-        }
     }
 
     render() {
 
-        const { dbData } = this.props;
-        const { display, filterUser, filterType, filterAmount, currentIndex, currentPage } = this.state;
+        const { dbAccount } = this.props,
+            { loading, record, filterUser, filterType, filterAmount, currentIndex, currentPage } = this.state;
 
-        return(
-            <div className='history'>
-                <FormControl>
-                    <InputLabel id='history-select-user'>Account</InputLabel>
-                    <Select
-                        labelId='history-select-user'
-                        className='history-select'
-                        value={filterUser}
-                        onChange={event => {
-                            this.renderRecord( 
-                                event.target.value,
-                                filterType,
-                                filterAmount,
-                                0,
-                                1
-                            );
-                        }}
-                    >
-                        {dbData.account.map((account, i) => {
-                            return <MenuItem 
-                                key={`mi-${i}`}
-                                value={account.id}
-                            >{account.username}</MenuItem>
-                        })}
-                        <MenuItem value='all'>All</MenuItem>
-                    </Select>
-                </FormControl>
-                <FormControl>
-                    <InputLabel id='history-select-type'>Type</InputLabel>
-                    <Select
-                        labelId='history-select-type'
-                        className='history-select-small'
-                        value={filterType}
-                        onChange={event => {
-                            this.renderRecord( 
-                                filterUser,
-                                event.target.value,
-                                filterAmount,
-                                0,
-                                1
-                            );
-                        }}
-                    >
-                        <MenuItem value='add'>Add</MenuItem>
-                        <MenuItem value='remove'>Remove</MenuItem>
-                        <MenuItem value='modify'>Modify</MenuItem>
-                        <MenuItem value='account'>Account</MenuItem>
-                        <MenuItem value='all'>All</MenuItem>
-                    </Select>
-                </FormControl>
-                <FormControl className='history-form-right'>
-                    <InputLabel id='history-select-display'>Display</InputLabel>
-                    <Select
-                        labelId='history-select-display'
-                        className='history-select-small'
-                        value={filterAmount}
-                        onChange={event => {
-                            this.renderRecord(
-                                filterUser,
-                                filterType,
-                                event.target.value,
-                                0,
-                                1
-                            );
+        return <div className='history'>
+            <FormControl>
+                <InputLabel id='history-select-user'>Account</InputLabel>
+                <Select
+                    labelId='history-select-user'
+                    className='history-select'
+                    value={filterUser}
+                    onChange={event => {
+                        this.renderRecord( 
+                            event.target.value,
+                            filterType,
+                            filterAmount,
+                            0,
+                            1
+                        );
                     }}
-                    >
-                        <MenuItem value={50}>50</MenuItem>
-                        <MenuItem value={25}>25</MenuItem>
-                        <MenuItem value={15}>15</MenuItem>
-                    </Select>
-                </FormControl>
-                <TableContainer component={Paper} className='history-table'>
-                    <Table>
-                        <TableHead>
+                >
+                    {dbAccount.map((account, i) => {
+                        return <MenuItem 
+                            key={`mi-${i}`}
+                            value={account.id}
+                        >{account.username}</MenuItem>
+                    })}
+                    <MenuItem value='all'>All</MenuItem>
+                </Select>
+            </FormControl>
+            <FormControl>
+                <InputLabel id='history-select-type'>Type</InputLabel>
+                <Select
+                    labelId='history-select-type'
+                    className='history-select-small'
+                    value={filterType}
+                    onChange={event => {
+                        this.renderRecord( 
+                            filterUser,
+                            event.target.value,
+                            filterAmount,
+                            0,
+                            1
+                        );
+                    }}
+                >
+                    <MenuItem value='add'>Add</MenuItem>
+                    <MenuItem value='remove'>Remove</MenuItem>
+                    <MenuItem value='modify'>Modify</MenuItem>
+                    <MenuItem value='account'>Account</MenuItem>
+                    <MenuItem value='all'>All</MenuItem>
+                </Select>
+            </FormControl>
+            <FormControl className='history-form-right'>
+                <InputLabel id='history-select-ammount'>Display</InputLabel>
+                <Select
+                    labelId='history-select-ammount'
+                    className='history-select-small'
+                    value={filterAmount}
+                    onChange={event => {
+                        this.renderRecord(
+                            filterUser,
+                            filterType,
+                            event.target.value,
+                            0,
+                            1
+                        );
+                }}
+                >
+                    <MenuItem value={50}>50</MenuItem>
+                    <MenuItem value={25}>25</MenuItem>
+                    <MenuItem value={15}>15</MenuItem>
+                </Select>
+            </FormControl>
+            <TableContainer component={Paper} className='history-table'>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Description</TableCell>
+                            <TableCell align='right'>Timestamp</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {(!loading && record) ? (
+                            record.length !== 0 ? (
+                                record.map((record, i) => {
+                                    return <TableRow key={`tr-${i}`}>
+                                        <TableCell>{record.name}</TableCell>
+                                        <TableCell>{record.log}</TableCell>
+                                        <TableCell align='right'>{record.timestamp.substring(0, 24)}</TableCell>
+                                    </TableRow>
+                                })
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={3}>No Records</TableCell>
+                                </TableRow>
+                            )
+                        ) : (
                             <TableRow>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Description</TableCell>
-                                <TableCell align='right'>Timestamp</TableCell>
+                                <TableCell colSpan={3}>Please wait...</TableCell>
                             </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {this.renderDisplay()}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            {(!loading && record) ? (
                 <div className='history-pagination'>
                     {currentIndex === 0 ? (
                         <Button
@@ -206,7 +216,7 @@ export default class History extends Component {
                         >{'<'}</Button>
                     )}
                     <h3 className='history-page'>{currentPage}</h3>
-                    {display.length < filterAmount ? (
+                    {record.length < filterAmount ? (
                         <Button
                             className='history-button-page'
                             disabled
@@ -232,7 +242,7 @@ export default class History extends Component {
                         >{'>'}</Button>
                     )}
                 </div>
-            </div>
-        );
+            ) : null }
+        </div>
     }
 }

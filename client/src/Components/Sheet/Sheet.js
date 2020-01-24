@@ -156,7 +156,7 @@ export default class Sheet extends Component {
     handleNewNote(event) { this.setState({ newNote: event }); }
 
     addPersonRow() {
-        const { dbData } = this.props;
+        const { dbSpread } = this.props;
         const array = this.state.personData, 
             { sheetId, personData, newName, newPhoneTag, newExtension, newRoom, newNote } = this.state;
 
@@ -174,7 +174,7 @@ export default class Sheet extends Component {
         if (newRoom.trim() !== '') dataRoom = newRoom.trim();
         if (newNote.trim() !== '') dataNote = newNote.trim();
 
-        dbData.sheet.forEach(sheet => {
+        dbSpread.sheet.forEach(sheet => {
             if (sheet.id === sheetId) {
                 sheet.value.personData.forEach(existPer => {
                     if (!idArray.includes(existPer.id)) idArray.push(existPer.id);
@@ -272,7 +272,7 @@ export default class Sheet extends Component {
     handleNewNumber(event) { this.setState({ newNumber: event }); }
 
     addMetaRow() {
-        const { dbData } = this.props;
+        const { dbSpread } = this.props;
         const array = this.state.metaData, { sheetId, metaData, newLine, newNumber } = this.state;
 
         let idArray = [],
@@ -283,7 +283,7 @@ export default class Sheet extends Component {
         if (newLine.trim() !== '') dataLine = newLine.trim();
         if (newNumber.trim() !== '') dataNumber = newNumber.trim();
 
-        dbData.sheet.forEach(sheet => {
+        dbSpread.sheet.forEach(sheet => {
             if (sheet.id === sheetId) {
                 sheet.value.metaData.forEach(existMeta => {
                     if (!idArray.includes(existMeta.id)) idArray.push(existMeta.id);
@@ -320,7 +320,7 @@ export default class Sheet extends Component {
 
     checkModification() {
 
-        const { dbData } = this.props;
+        const { dbSpread } = this.props;
         const { sheetId, title, personData, deletePerson, metaData, deleteMeta } = this.state;
         
         let newSheetArray = [],
@@ -338,7 +338,7 @@ export default class Sheet extends Component {
                 }
             };
 
-        dbData.sheet.forEach(sheet => {
+        dbSpread.sheet.forEach(sheet => {
             if (sheet.id === sheetId) {
                 if (sheet.title !== title) {
                     oldTitle = sheet.title;
@@ -419,19 +419,17 @@ export default class Sheet extends Component {
         });
 
         if (oldTitle === '' && modData.length === 0) return alert('No modifications were made to CyberDex.');
-        this.modifySheet(newSheetArray, oldTitle, modData);
+        this.putSheet(newSheetArray, oldTitle, modData);
     }
 
-    modifySheet(sheet, oldTitle, modData) {
+    putSheet(sheet, oldTitle, modData) {
 
         // Access current dbArray.
-        const { account, dbData, getDataFromDB, resetDisplay } = this.props,
-            { title } = this.state,
-            recordArray = dbData.record;
-        
+        const { account, sheetId, postSpread, resetDisplay } = this.props,
+            { title } = this.state;
         let newLog = '';
-
-        console.log(modData);
+        
+        if (account.name === '' || account.name === null) return alert('Account does not have a name.');
 
         if (oldTitle !== '') {
             newLog = `Replaced current title "${oldTitle}" with "${title}".`
@@ -473,8 +471,6 @@ export default class Sheet extends Component {
                 }
             });
         }
-        
-        if (account.name === '') return alert('Account does not have a name.');
 
         const newRecord = {
             id: account.id,
@@ -484,26 +480,23 @@ export default class Sheet extends Component {
             timestamp: Date()
         }
 
-        console.log(newRecord);
-
-        recordArray.unshift(newRecord);
-
         // Axios request to post the new id number and data from spreadsheet object.
         axios({
 
-            url: 'http://localhost:3001/api/updateData',
+            url: 'http://localhost:3001/api/putSheet',
             method: 'PUT',
             data: {
-                id: dbData.id,
-                title: dbData.title,
+                id: account.spreadId,
+                sheetId: sheetId,
+                username: account.username,
+                password: account.password,
                 sheet: sheet,
-                account: dbData.account,
-                record: recordArray
+                record: newRecord
             }
 
         }).then((reponse) => {
             console.log(reponse);
-            getDataFromDB();
+            postSpread();
             resetDisplay();
         }).catch((error) => {
             console.log(error);

@@ -43,17 +43,273 @@ router.get('/', (req, res) => {
     console.log('MongoDB Connected');
 });
 
-// Route to retrieve data from the database
-router.get('/getData', (req, res) => {
+router.post('/postLogIn', (req, res) => {
+    const { username, password } = req.body,
+        idArray = [],
+        accArray = [],
+        recArray = [];
+    let clientObject = {},
+        dbSpread = false;
+
     // Use Mongoose to find data with the given schema
-    Data.find((err, data) => {
+    Data.find((err, database) => {
+        if (err) return res.send({ success: false, error: err });
 
-        console.log(data);
+        database.forEach(spread => {
+            spread.account.forEach(acc => {
+                if (username === acc.username && password === acc.password) {
+                    if (acc.auth.includes('lock')) return res.send({ success: false, message: 'Account is locked.' });
+                    dbSpread = spread;
+                    clientObject = acc;
+                }
+            });
+        });
+        if (!dbSpread) return res.send({ success: false, message: 'Failed to log in.'});
 
-        if (err) {
-            return res.json({ success: false, error: err });
+        dbSpread.account.forEach(acc => {
+            idArray.push(acc.id);
+            const accObject = {
+                id: acc.id,
+                spreadId: acc.spreadId,
+                name: acc.name,
+                username: acc.username,
+                auth: acc.auth,
+                type: acc.type
+            };
+            if (clientObject.type === 'admin') {
+                accArray.push(accObject);
+            } else if (clientObject.id === acc.id) accArray.push(accObject);
+        });
+
+        if (clientObject.type === 'admin') {
+
+            dbSpread.record.forEach(rec => {
+                if (recArray.length < 15) recArray.push(rec);
+            });
+            return res.send({ 
+                success: true, 
+                data: {
+                    client: clientObject,
+                    accId: idArray,
+                    account: accArray,
+                    record: recArray
+                }
+            });
         }
-        return res.json({ success: true, data: data });
+        return res.send({ 
+            success: true, 
+            data: {
+                client: clientObject,
+                accId: [],
+                account: accArray,
+                record: []
+            }
+        });
+    });
+});
+
+// Route to retrieve data from the database
+router.post('/postSpread', (req, res) => {
+    const { id, username, password } = req.body,
+        spreadId = [],
+        spreadObj = {
+            id: Number,
+            title: String,
+            sheet: Array
+        }
+        accId = [],
+        accArray = [],
+        recArray = [];
+    let clientObject = {},
+        dbSpread = false;
+
+    Data.find((err, database) => {
+        if (err) return res.send({ success: false, error: err });
+
+        database.forEach(spread => {
+            spreadId.push(spread.id);
+            if (spread.id === id) {
+                spreadObj.id = spread.id;
+                spreadObj.title = spread.title;
+                spreadObj.sheet = spread.sheet;
+                dbSpread = spread;
+                spread.account.forEach(acc => {
+                    if (acc.username === username && acc.password === password) {
+                        clientObject = acc;
+                        if (acc.auth.includes('lock')) return res.send({ success: false, message: 'Account is locked.' });
+                    }
+                });
+            };
+        });
+        if (!dbSpread) return res.send({ success: false, message: 'Client not authorized.' });
+
+        dbSpread.account.forEach(acc => {
+            accId.push(acc.id);
+            const accObject = {
+                id: acc.id,
+                spreadId: acc.spreadId,
+                name: acc.name,
+                username: acc.username,
+                auth: acc.auth,
+                type: acc.type
+            };
+            if (clientObject.type === 'admin') {
+                accArray.push(accObject);
+            } else if (clientObject.id === acc.id) accArray.push(accObject);
+        });
+
+        if (clientObject.type === 'admin') {
+            dbSpread.record.forEach(rec => {
+                if (recArray.length < 15) recArray.push(rec);
+            });
+            return res.send({ 
+                success: true, 
+                data: {
+                    spreadId: spreadId,
+                    spread: spreadObj,
+                    accId: accId,
+                    account: accArray,
+                    record: recArray
+                } 
+            });
+        }
+        return res.send({ 
+            success: true, 
+            data: {
+                spreadId: [],
+                spread: spreadObj,
+                accId: [],
+                account: [],
+                record: []
+            } 
+        });
+    });
+});
+
+router.put('/putSheet', (req, res) => {
+
+    // Pull the ID and message from the body of the request.
+    const { id, sheetId, username, password, sheet, record } = req.body;
+    let clientObject = [];
+
+    Data.findOne({ id: id }, (error, spread) => {
+        if (error) return res.send({ success: false, error: error });
+
+        spread.account.forEach(acc => {
+            if (acc.username === username && acc.password === password) {
+                clientObject = acc.auth;
+                if (acc.auth.includes('lock')) return res.send({ success: false, message: 'Account is locked.' });
+            }
+        });
+        if (!clientObject.includes(sheetId) && !clientObject.includes('full')) return res.send({ success: false, message: 'Client not authorized.' });
+
+        const newData = spread,
+            newRecord = [];
+        spread.record.forEach(rec => newRecord.push(rec));
+        newRecord.unshift(record);
+
+        // Configure the Schema object.
+        newData.id = id;
+        newData.title = spread.title;
+        newData.sheet = sheet;
+        newData.account = spread.account;
+        newData.record = newRecord;
+    
+        Data.replaceOne({ _id: spread._id }, newData, err => {
+            if (err) {
+                return res.send({ success: false, error: err });
+            } else {
+                return res.send({ success: true });
+            }
+        });
+    });
+});
+
+router.put('/putAccount', (req, res) => {
+    // Pull the ID and message from the body of the request.
+    const { id, username, password, title, account, record } = req.body,
+        accArray = [],
+        existArray = [],
+        keepArray = [];
+    let clientObject = false,
+        nextIndex = false;
+
+    Data.findOne({ id: id }, (err, spread) => {
+        if (err) return res.send({ success: false, error: err });
+
+        spread.account.forEach(acc => {
+            if (acc.username === username && acc.password === password) {
+                clientObject = acc;
+                if (acc.auth.includes('lock')) return res.send({ success: false, message: 'Account is locked.' });
+            }
+            existArray.push(acc.id);
+            account.forEach(newAcc => {
+                if (acc.id === newAcc.id) keepArray.push(newAcc.id);
+            });
+        });
+        if (!clientObject) return res.send({ success: false, message: 'Client not authorized.' });
+
+        spread.account.forEach(acc => {
+            nextIndex = false;
+            account.forEach(newAcc => {
+                let password = acc.password;
+                const person = {
+                    id: newAcc.id,
+                    spreadId: newAcc.spreadId,
+                    name: newAcc.name,
+                    username: newAcc.username,
+                    password: password,
+                    auth: newAcc.auth,
+                    type: newAcc.type
+                };
+                if (!existArray.includes(newAcc.id) && clientObject.type === 'admin') {
+                    password = newAcc.password;
+                    accArray.push(person);
+                    existArray.push(newAcc.id);
+                }
+                if (!nextIndex && acc.id === newAcc.id) {
+                    nextIndex = true;
+                    if (clientObject.type === 'admin' && !keepArray.includes(newAcc.id)) return
+                    accArray.push(person);
+                }
+            });
+        });
+
+        const newData = spread,
+            newRecord = [];
+        spread.record.forEach(rec => newRecord.push(rec));
+        newRecord.unshift(record);
+
+        // Configure the Schema object.
+        newData.id = id;
+        newData.title = title;
+        newData.sheet = spread.sheet;
+        newData.account = accArray;
+        newData.record = newRecord;
+
+        Data.replaceOne({ _id: spread._id }, newData, error => {
+            if (error) return res.send({ success: false, error: error });
+            return res.send({ success: true });
+        });
+    });
+});
+
+router.post('/postHistory', (req, res) => {
+    const { id, user, type, amount, index } = req.body,
+        newDisplay = [];
+
+    Data.findOne({ id: id }, (err, spread) => {
+        if (err) return res.send({ success: false, error: err });
+
+        for (var i = index; newDisplay.length < amount; i++) {
+            if (user === spread.record[i].id || user === 'all') {
+                if (type === spread.record[i].type || type === 'all') {
+                    newDisplay.push(spread.record[i]);
+                }
+            }
+            if (i === spread.record.length - 1) return res.send({ success: true, data: newDisplay});
+        }
+        return res.send({ success: true, data: newDisplay });
     });
 });
 
@@ -75,37 +331,8 @@ router.post('/postData', (req, res) => {
     // To save to the database.
     newData.save(err => {
         if (err) {
-           return res.json({ success: false, error: err }); 
-        } else return res.json({ success: true });
-    });
-});
-
-router.put('/updateData', (req, res) => {
-
-    // Pull the ID and message from the body of the request.
-    const { id, title, sheet, account, record } = req.body;
-
-    Data.findOne({ id: id }, (error, doc) => {
-        if (error) {
-            return res.json({ success: false, error: error });
-        }
-
-        let newData = doc;
-
-        // Configure the Schema object.
-        newData.id = id;
-        newData.title = title;
-        newData.sheet = sheet;
-        newData.account = account;
-        newData.record = record;
-    
-        Data.replaceOne({ _id: doc._id }, newData, err => {
-            if (err) {
-                return res.json({ success: false, error: err });
-            } else {
-                return res.json({ success: true });
-            }
-        });
+           return res.send({ success: false });
+        } else return res.send({ success: true });
     });
 });
 
@@ -113,9 +340,9 @@ router.put('/updateData', (req, res) => {
 router.delete('/deleteData', (req, res) => {
     Data.deleteOne({ id: req.body.id }, err => {
         if (err) {
-            return res.json({ success: false, error: err });
+            return res.send({ success: false, error: err });
         } else {
-            return res.json({ success: true });
+            return res.send({ success: true });
         }
     });
 });

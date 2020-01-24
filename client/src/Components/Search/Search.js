@@ -12,7 +12,7 @@ export default function Search(props) {
             className='search-text'
             value={props.searchInput}
             onChange={event => props.changeInput(event)}
-            label={`Search ${props.dbData.title}`}
+            label={`Search ${props.dbSpread.title}`}
             onKeyPress={event => {
                 if (props.searchInput === '') return
                 if (event.key === 'Enter') {
