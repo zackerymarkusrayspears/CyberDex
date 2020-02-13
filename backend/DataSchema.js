@@ -6,9 +6,10 @@ const Schema = mongoose.Schema;
 const DataSchema = new Schema(
     {
         id: Number,
-        spreadsheetId: String,
-        spreadsheetTitle: String,
+        title: String,
         sheet: Array,
+        account: Array,
+        record: Array
     },
     { timestamps: true }
 );
