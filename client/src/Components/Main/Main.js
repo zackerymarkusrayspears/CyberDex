@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import './Main.css';
 import Search from '../Search/Search';
 import Sheet from '../Sheet/Sheet';
 
@@ -8,28 +7,38 @@ export default class Main extends Component {
         super(props);
         this.state = {
             searchInput: '',
+            searchHelper: '',
             display: [],
             editMode: ''
         }
         this.changeInput = this.changeInput.bind(this);
         this.iterateSearch = this.iterateSearch.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
-        this.resetDisplay = this.resetDisplay.bind(this);
         this.setEditMode = this.setEditMode.bind(this);
+        this.resetDisplay = this.resetDisplay.bind(this);
     }
 
     changeInput(event) {
         this.setState({
             display: [],
-            searchInput: event.target.value
+            searchInput: event.target.value,
+            searchHelper: ''
         });
     }
 
     iterateSearch() {
 
-        const { dbSpread } = this.props, { searchInput, display } = this.state;
-        const self = this, input = searchInput.trim().toLowerCase(), inputArray = input.split(' ');
-        let sheetIdArray = [], sheetTitleArray = [];
+        const { 
+            dbSpread 
+        } = this.props, { 
+            searchInput, 
+            display 
+        } = this.state,
+            input = searchInput.trim().toLowerCase(), 
+            inputArray = input.split(' '), 
+            self = this;
+        let sheetIdArray = [], 
+            sheetTitleArray = [];
 
         dbSpread.sheet.forEach(sheet => {
             sheetTitleArray = sheet.title.toLowerCase().split(' ');
@@ -49,14 +58,14 @@ export default class Main extends Component {
             }
         });
 
-        if (display.length < 1) alert(`Error: "${searchInput}" is not found.`);
+        if (display.length < 1) this.setState({ searchHelper: `"${searchInput}" is not found.` });
     }
 
     handleSearch(sheet, inputArray) {
 
         const newDisplay = this.state.display,
-            newMetaList = [],
-            newPersonList = [],
+            newMeta = [],
+            newPerson = [],
             input = inputArray.join(' ');
 
         let pushPerson = false,
@@ -69,14 +78,14 @@ export default class Main extends Component {
             newObject = {
                 id: sheet.id,
                 title: sheet.title,
-                metaList: newMetaList,
-                personList: newPersonList
+                meta: newMeta,
+                person: newPerson
             };
 
         // Add all metaData to display.
-        sheet.value.metaData.forEach(meta => newMetaList.push(meta));
+        sheet.meta.forEach(meta => newMeta.push(meta));
 
-        sheet.value.personData.forEach(person => {
+        sheet.person.forEach(person => {
             // If search is for all results.
             if (inputArray.length === 0) pushPerson = true;
             // If person's values is not null.
@@ -119,11 +128,11 @@ export default class Main extends Component {
                 }
             }
             if (unshiftPerson) {
-                newPersonList.unshift(person);
+                newPerson.unshift(person);
                 unshiftPerson = false;
             }
             if (pushPerson) {
-                newPersonList.push(person);
+                newPerson.push(person);
                 pushPerson = false;
             }
         });
@@ -133,49 +142,56 @@ export default class Main extends Component {
             this.setState({ display: newDisplay });
         }
 
-        if (!unshiftObject && newPersonList.length > 0) {
+        if ((!unshiftObject && newPerson.length > 0) || inputArray.length === 0) {
             newDisplay.push(newObject);
             this.setState({ display: newDisplay });
         }
     }
 
     resetDisplay() { 
-        this.setState({ 
-            display: [],
-            editMode: ''
-        }); 
+        this.setState({ display: [], editMode: '' }); 
     }
 
     setEditMode(event) { this.setState({ editMode: event }); }
 
     render() {
 
-        const { searchInput, display, editMode } = this.state;
-        const { account, dbSpread, postSpread } = this.props;
+        const { 
+            classes,
+            account, 
+            dbSpread, 
+            putSheet 
+        } = this.props, { 
+            searchInput, 
+            searchHelper,
+            display, 
+            editMode 
+        } = this.state;
 
-        return(
-            <div className='main'>
-                <Search
-                    dbSpread={dbSpread}
-                    searchInput={searchInput}
-                    changeInput={this.changeInput}
-                    iterateSearch={this.iterateSearch}
-                />
-                {display.length !== 0 ? (
-                    display.map((data, i) => {
-                        return <Sheet 
-                            key={`sheet-${i}`}
-                            account={account}
-                            dbSpread={dbSpread}
-                            postSpread={postSpread}
-                            data={data}
-                            editMode={editMode}
-                            setEditMode={this.setEditMode}
-                            resetDisplay={this.resetDisplay}
-                        />
-                    })
-                ) : null }
-            </div>
-        );
+        return <div className={classes.route}>
+            <Search
+                classes={classes}
+                dbSpread={dbSpread}
+                searchInput={searchInput}
+                searchHelper={searchHelper}
+                changeInput={this.changeInput}
+                iterateSearch={this.iterateSearch}
+            />
+            {display.length !== 0 ? (
+                display.map((data, i) => {
+                    return <Sheet 
+                        key={`sheet-${i}`}
+                        classes={classes}
+                        account={account}
+                        dbSpread={dbSpread}
+                        putSheet={putSheet}
+                        data={data}
+                        editMode={editMode}
+                        setEditMode={this.setEditMode}
+                        resetDisplay={this.resetDisplay}
+                    />
+                })
+            ) : null }
+        </div>
     }
 }

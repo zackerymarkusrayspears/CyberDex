@@ -1,18 +1,16 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-import './Sheet.css';
 import PersonTable from '../PersonTable/PersonTable';
 import MetaTable from '../MetaTable/MetaTable';
-import { Button } from '@material-ui/core';
-
 
 export default class Sheet extends Component {
     constructor(props) {
         super(props);
         this.state = {
             sheetId: this.props.data.id,
-            deletePerson: [],
-            personData: this.props.data.personList,
+            person: this.props.data.person,
+            meta: this.props.data.meta,
+            idPerson: [],
+            idMeta: [],
             title: this.props.data.title,
             editTitle: '',
             editPerson: '',
@@ -26,8 +24,6 @@ export default class Sheet extends Component {
             newExtension: '',
             newRoom: '',
             newNote: '',
-            metaData: this.props.data.metaList,
-            deleteMeta: [],
             editMeta: '',
             editLine: '',
             editNumber: '',
@@ -63,6 +59,7 @@ export default class Sheet extends Component {
         this.handleNewNumber = this.handleNewNumber.bind(this);
         this.addMetaRow = this.addMetaRow.bind(this);
         this.clearMetaRow = this.clearMetaRow.bind(this);
+        this.inputError = this.inputError.bind(this);
     }
 
     editSheetTitle() {
@@ -75,32 +72,68 @@ export default class Sheet extends Component {
     handleSheetTitle(event) { this.setState({ editTitle: event }); }
 
     replaceSheetTitle() {
+        const { dbSpread } = this.props,
+            { editTitle } = this.state;
+        let takenTitle = false;
+
+        dbSpread.sheet.forEach(data => {
+            if (data.title === editTitle.trim()) takenTitle = true;
+        });
+        if (takenTitle) return alert('Title is already being used.');
+
         this.setState({ 
-            title: this.state.editTitle.trim(),
+            title: editTitle.trim(),
             editTitle: '',
             editPerson: ''
         });
     }
     
-    editPersonRow(row, name, phoneTag, extension, room, note) {
+    editPersonRow(row, person) {
+        let personName = '',
+            personPhoneTag = '',
+            personExtension = '',
+            personRoom = '',
+            personNote = '';
+
+        if (person.name !== null) personName = person.name;
+        if (person.phoneTag !== null) personPhoneTag = person.phoneTag;
+        if (person.extension !== null) personExtension = person.extension;
+        if (person.room !== null) personRoom = person.room;
+        if (person.note !== null) personNote = person.note;
+
         this.setState({ 
             editPerson: row,
-            editName: name,
-            editPhoneTag: phoneTag,
-            editExtension: extension,
-            editRoom: room,
-            editNote: note
+            editName: personName,
+            editPhoneTag: personPhoneTag,
+            editExtension: personExtension,
+            editRoom: personRoom,
+            editNote: personNote
         });
     }
 
-    removePersonRow(row, id) {
-        const display = this.state.personData;
-        const array = this.state.deletePerson;
-        display.splice(row, 1);
-        array.push(id);
+    removePersonRow(row, data) {
+        const { person, idPerson } = this.state,
+            newPerson = person,
+            newIdPerson = idPerson;
+
+        if ((typeof data.id) === 'string') {
+            newPerson.splice(row, 1);
+            newIdPerson.splice(newIdPerson.indexOf(parseInt(data.id.substring(4))), 1);
+        } else {
+            const nullPerson = {
+                id: data.id,
+                name: null,
+                phoneTag: null,
+                extension: null,
+                room: null,
+                note: null
+            }
+            newPerson.splice(row, 1, nullPerson);
+        }
+
         this.setState({ 
-            personData: display,
-            deletePerson: array 
+            person: newPerson,
+            idPerson: newIdPerson
         });
     }
 
@@ -111,33 +144,32 @@ export default class Sheet extends Component {
     handleEditNote(event) { this.setState({ editNote: event }); }
 
     replacePersonRow(row, id) {
-        const array = this.state.personData, 
-            { editName, editPhoneTag, editExtension, editRoom, editNote } = this.state;
+        const { person, editName, editPhoneTag, editExtension, editRoom, editNote } = this.state,
+            newPerson = person;
+        let personName = null,
+            personPhoneTag = null,
+            personExtension = null,
+            personRoom = null,
+            personNote = null;
 
-        let dataName = null,
-            dataPhoneTag = null,
-            dataExtension = null,
-            dataRoom = null,
-            dataNote = null;
-
-        if (editName.trim() !== '') dataName = editName.trim();
-        if (editPhoneTag.trim() !== '') dataPhoneTag = editPhoneTag.trim();
-        if (editExtension.trim() !== '') dataExtension = editExtension.trim();
-        if (editRoom.trim() !== '') dataRoom = editRoom.trim();
-        if (editNote.trim() !== '') dataNote = editNote.trim();
+        if (editName.trim() !== '') personName = editName.trim();
+        if (editPhoneTag.trim() !== '') personPhoneTag = editPhoneTag.trim();
+        if (editExtension.trim() !== '') personExtension = editExtension.trim();
+        if (editRoom.trim() !== '') personRoom = editRoom.trim();
+        if (editNote.trim() !== '') personNote = editNote.trim();
 
         const newData = {
             id: id,
-            name: dataName,
-            phoneTag: dataPhoneTag,
-            extension: dataExtension,
-            room: dataRoom,
-            note: dataNote,
+            name: personName,
+            phoneTag: personPhoneTag,
+            extension: personExtension,
+            room: personRoom,
+            note: personNote,
         }
-        array.splice(row, 1, newData);
+        newPerson.splice(row, 1, newData);
 
         this.setState({ 
-            personData: array,
+            person: newPerson,
             editPerson: '',
             editName: '',
             editPhoneTag: '',
@@ -156,52 +188,39 @@ export default class Sheet extends Component {
     handleNewNote(event) { this.setState({ newNote: event }); }
 
     addPersonRow() {
-        const { dbSpread } = this.props;
-        const array = this.state.personData, 
-            { sheetId, personData, newName, newPhoneTag, newExtension, newRoom, newNote } = this.state;
+        const { person, idPerson, newName, newPhoneTag, newExtension, newRoom, newNote } = this.state,
+            newPerson = person,
+            newIdPerson = idPerson;
+        let newId = 1,
+            personName = null,
+            personPhoneTag = null,
+            personExtension = null,
+            personRoom = null,
+            personNote = null;
 
-        let idArray = [],
-            dataId = 1,
-            dataName = null,
-            dataPhoneTag = null,
-            dataExtension = null,
-            dataRoom = null,
-            dataNote = null;
+        if (newName.trim() !== '') personName = newName.trim();
+        if (newPhoneTag.trim() !== '') personPhoneTag = newPhoneTag.trim();
+        if (newExtension.trim() !== '') personExtension = newExtension.trim();
+        if (newRoom.trim() !== '') personRoom = newRoom.trim();
+        if (newNote.trim() !== '') personNote = newNote.trim();
 
-        if (newName.trim() !== '') dataName = newName.trim();
-        if (newPhoneTag.trim() !== '') dataPhoneTag = newPhoneTag.trim();
-        if (newExtension.trim() !== '') dataExtension = newExtension.trim();
-        if (newRoom.trim() !== '') dataRoom = newRoom.trim();
-        if (newNote.trim() !== '') dataNote = newNote.trim();
-
-        dbSpread.sheet.forEach(sheet => {
-            if (sheet.id === sheetId) {
-                sheet.value.personData.forEach(existPer => {
-                    if (!idArray.includes(existPer.id)) idArray.push(existPer.id);
-                });
-                personData.forEach(newPer => {
-                    if (!idArray.includes(newPer.id)) idArray.push(newPer.id);
-                });
-            }
-        });
-
-        while (idArray.includes(dataId)) dataId++;
+        while (newIdPerson.includes(newId)) newId++;
+        newIdPerson.push(newId);
 
         const newData = {
-            id: dataId,
-            name: dataName,
-            phoneTag: dataPhoneTag,
-            extension: dataExtension,
-            room: dataRoom,
-            note: dataNote,
+            id: `new-${newId}`,
+            name: personName,
+            phoneTag: personPhoneTag,
+            extension: personExtension,
+            room: personRoom,
+            note: personNote
         }
+        newPerson.push(newData);
 
-        console.log(newData);
-
-        array.push(newData);
+        newPerson.sort((a, b) => a.name.localeCompare(b.name));
 
         this.setState({ 
-            personData: array, 
+            person: newPerson, 
             newName: '',
             newPhoneTag: '',
             newExtension: '',
@@ -220,22 +239,40 @@ export default class Sheet extends Component {
         });
     }
 
-    editMetaRow(row, line, number) {
+    editMetaRow(row, meta) {
+        let metaLine = '',
+            metaNumber = '';
+
+        if (meta.line !== null) metaLine = meta.line;
+        if (meta.Number !== null) metaNumber = meta.number;
+
         this.setState({
             editMeta: row,
-            editLine: line,
-            editNumber: number
+            editLine: metaLine,
+            editNumber: metaNumber
         });
     }
 
-    removeMetaRow(row, id) {
-        const display = this.state.metaData;
-        const array = this.state.deleteMeta;
-        display.splice(row, 1);
-        array.push(id);
+    removeMetaRow(row, data) {
+        const { meta, idMeta } = this.state,
+            newMeta = meta,
+            newIdMeta = idMeta;
+
+        if ((typeof data.id) === 'string') {
+            newMeta.splice(row, 1);
+            newIdMeta.splice(newIdMeta.indexOf(parseInt(data.id.substring(4))), 1);
+        } else {
+            const nullMeta = {
+                id: data.id,
+                line: null,
+                number: null
+            }
+            newMeta.splice(row, 1, nullMeta);
+        }
+
         this.setState({ 
-            metaData: display,
-            deleteMeta: array 
+            meta: newMeta,
+            idMeta: newIdMeta 
         });
     }
 
@@ -243,23 +280,23 @@ export default class Sheet extends Component {
     handleEditNumber(event) { this.setState({ editNumber: event }); }
 
     replaceMetaRow(row, id) {
-        const array = this.state.metaData, { editLine, editNumber } = this.state;
+        const { meta, editLine, editNumber } = this.state;
+        let metaLine = null,
+            metaNumber = null;
 
-        let dataLine = null , 
-            dataNumber = null;
+        if (editLine.trim() !== '') metaLine = editLine.trim();
+        if (editNumber.trim() !== '') metaNumber = editNumber.trim();
 
-        if (editLine.trim() !== '') dataLine = editLine.trim();
-        if (editNumber.trim() !== '') dataNumber = editNumber.trim();
-
-        const newData = {
+        const newMeta = meta,
+            newData = {
             id: id,
-            line: dataLine,
-            number: dataNumber
-        }
-        array.splice(row, 1, newData);
+            line: metaLine,
+            number: metaNumber
+        };
+        newMeta.splice(row, 1, newData);
 
         this.setState({ 
-            metaData: array,
+            meta: newMeta,
             editMeta: '',
             editLine: '',
             editNumber: ''
@@ -272,40 +309,31 @@ export default class Sheet extends Component {
     handleNewNumber(event) { this.setState({ newNumber: event }); }
 
     addMetaRow() {
-        const { dbSpread } = this.props;
-        const array = this.state.metaData, { sheetId, metaData, newLine, newNumber } = this.state;
+        const { meta, idMeta, newLine, newNumber } = this.state,
+            newMeta = meta,
+            newIdMeta = idMeta;
+        let newId = 1,
+            metaLine = null,
+            metaNumber = null;
 
-        let idArray = [],
-            dataId = 1,
-            dataLine = null, 
-            dataNumber = null;
+        if (newLine.trim() !== '') metaLine = newLine.trim();
+        if (newNumber.trim() !== '') metaNumber = newNumber.trim();
 
-        if (newLine.trim() !== '') dataLine = newLine.trim();
-        if (newNumber.trim() !== '') dataNumber = newNumber.trim();
-
-        dbSpread.sheet.forEach(sheet => {
-            if (sheet.id === sheetId) {
-                sheet.value.metaData.forEach(existMeta => {
-                    if (!idArray.includes(existMeta.id)) idArray.push(existMeta.id);
-                });
-                metaData.forEach(newMeta => {
-                    if (!idArray.includes(newMeta.id)) idArray.push(newMeta.id);
-                });
-            }
-        });
-
-        while (idArray.includes(dataId)) dataId++;
+        while (newIdMeta.includes(newId)) newId++;
+        newIdMeta.push(newId);
 
         const newData = {
-            id: dataId,
-            line: dataLine,
-            number: dataNumber
+            id: `new-${newId}`,
+            line: metaLine,
+            number: metaNumber
         }
+        newMeta.push(newData);
 
-        array.push(newData);
+        newMeta.sort((a, b) => a.line.localeCompare(b.line));
 
         this.setState({ 
-            metaData: array, 
+            meta: newMeta, 
+            idMeta: newIdMeta,
             newLine: '',
             newNumber: ''
         });
@@ -318,196 +346,78 @@ export default class Sheet extends Component {
         });
     }
 
-    checkModification() {
+    inputError(type, value) {
+        const {
+            editName,
+            editPhoneTag,
+            editExtension,
+            editRoom,
+            editNote,
+            editLine,
+            editNumber,
+            newName,
+            newPhoneTag,
+            newExtension,
+            newRoom,
+            newNote,
+            newLine,
+            newNumber
+        } = this.state;
 
-        const { dbSpread } = this.props;
-        const { sheetId, title, personData, deletePerson, metaData, deleteMeta } = this.state;
-        
-        let newSheetArray = [],
-            newPersonData = [],
-            newMetaData = [],
-            oldTitle = '',
-            modData = [],
-            update = false,
-            updateSheet = {
-                id: sheetId,
-                title: title,
-                value: {
-                    metaData: newMetaData,
-                    personData: newPersonData
-                }
-            };
-
-        dbSpread.sheet.forEach(sheet => {
-            if (sheet.id === sheetId) {
-                if (sheet.title !== title) {
-                    oldTitle = sheet.title;
-                }
-                sheet.value.personData.forEach(existPer => {
-                    if (deletePerson.includes(existPer.id) && !modData.includes('deleted')) return modData.push('deleted');
-                    personData.forEach(updPer => {
-                        if (updPer.id === existPer.id) {
-                            if (updPer.name !== existPer.name) {
-                                update = true;
-                            }
-                            if (updPer.phoneTag !== existPer.phoneTag) {
-                                update = true;
-                            }
-                            if (updPer.extension !== existPer.extension) {
-                                update = true;
-                            }
-                            if (updPer.room !== existPer.room) {
-                                update = true;
-                            }
-                            if (updPer.note !== existPer.note) {
-                                update = true;
-                            }
-                            if (update) {
-                                newPersonData.push(updPer);
-                                if (!modData.includes('updated')) modData.push('updated');
-                            }
-                        }
-                    });
-                    if (update) {
-                        update = false;
-                    } else {
-                        newPersonData.push(existPer);
-                    }
-                });
-                personData.forEach(newPer => {
-                    if (!newPersonData.includes(newPer)) {
-                        newPersonData.push(newPer);
-                        if (!modData.includes('added')) modData.push('added');
-                    }
-                });
-                sheet.value.metaData.forEach(existMeta => {
-                    if (deleteMeta.includes(existMeta.id) && !modData.includes('deleted')) return modData.push('deleted');
-                    metaData.forEach(updMeta => {
-                        if (updMeta.id === existMeta.id) {
-                            if (updMeta.line !== existMeta.line) {
-                                update = true;
-                            }
-                            if (updMeta.number !== existMeta.number) {
-                                update = true;
-                            }
-                            if (update) {
-                                newMetaData.push(updMeta);
-                                if (!modData.includes('updated')) modData.push('updated');
-                            }
-                        }
-                    });
-                    if (update) {
-                        update = false;
-                    } else {
-                        newMetaData.push(existMeta);
-                    }
-                });
-                metaData.forEach(newMeta => {
-                    if (!newMetaData.includes(newMeta)) {
-                        newMetaData.push(newMeta);
-                        if (!modData.includes('added')) modData.push('added');
-                    }
-                });
-                update = true;
-            }
-            if (update) {
-                newSheetArray.push(updateSheet);
-                update = false;
-            } else {
-                newSheetArray.push(sheet);
-            }
-        });
-
-        if (oldTitle === '' && modData.length === 0) return alert('No modifications were made to CyberDex.');
-        this.putSheet(newSheetArray, oldTitle, modData);
-    }
-
-    putSheet(sheet, oldTitle, modData) {
-
-        // Access current dbArray.
-        const { account, sheetId, postSpread, resetDisplay } = this.props,
-            { title } = this.state;
-        let newLog = '';
-        
-        if (account.name === '' || account.name === null) return alert('Account does not have a name.');
-
-        if (oldTitle !== '') {
-            newLog = `Replaced current title "${oldTitle}" with "${title}".`
-                if (modData.length !== 0) {
-                    newLog += '  Account also ';
-                    modData.forEach((action, i) => {
-                        switch (i) {
-                            case 0:
-                                if (modData.length === 1) newLog += `${action} content.`;
-                                if (modData.length === 2) newLog += `${action} and `;
-                                if (modData.length === 3) newLog += `${action}, `;
-                                break;
-                            case 1:
-                                if (modData.length === 2) newLog += `${action} content.`;
-                                if (modData.length === 3)newLog += `${action}, `
-                                break;
-                            default:
-                                if (modData.length === 3) newLog += `and ${action} content.`
-                                break;
-                        }
-                    });
-                };
-        } else {
-            newLog += 'Account ';
-            modData.forEach((action, i) => {
-                switch (i) {
-                    case 0:
-                        if (modData.length === 1) newLog += `${action} content on ${title}.`;
-                        if (modData.length === 2) newLog += `${action} and `;
-                        if (modData.length === 3) newLog += `${action}, `;
-                        break;
-                    case 1:
-                        if (modData.length === 2) newLog += `${action} content on ${title}`;
-                        if (modData.length === 3)newLog += `${action}, `
-                        break;
-                    default:
-                        if (modData.length === 3) newLog += `and ${action} content on ${title}.`
-                        break;
-                }
-            });
+        switch (type) {
+            case 'title':
+                if (value !== '' && value.length > 50) return 'Max 50 Characters.'
+                return ''
+            case 'small':
+                if (value !== '' && value.length > 10) return 'Max 10 Characters.'
+                return ''
+            case 'note':
+                if (value !== '' && value.length > 100) return 'Max 100 Characters.'
+                return ''
+            case 'editPerson':
+                if (editName !== '' && editName.length > 32 && (
+                    editPhoneTag !== '' && editPhoneTag.length > 32 ||
+                    editExtension !== '' && editExtension.length > 10 ||
+                    editRoom !== '' && editRoom.length > 10 ||
+                    editNote !== '' && editNote.length > 100
+                )) return 'error'
+                return ''
+            case 'editMeta':
+                if (editLine !== '' && editLine.length > 32) return 'Max 32 Characters.'
+                if (editNumber !== '' && editNumber.length > 32) return 'Max 32 Characters.'
+                return ''
+            case 'newPerson':
+                if (newName !== '' && newName.length > 32 && (
+                    newPhoneTag !== '' && newPhoneTag.length > 32 ||
+                    newExtension !== '' && newExtension.length > 10 ||
+                    newRoom !== '' && newRoom.length > 10 ||
+                    newNote !== '' && newNote.length > 100
+                )) return 'error'
+                return ''
+            case 'newMeta':
+                if (newLine !== '' && newLine.length > 32) return 'Max 32 Characters.'
+                if (newNumber !== '' && newNumber.length > 32) return 'Max 32 Characters.'
+                return ''
+            default:
+                if (value !== '' && value.length > 32) return 'Max 32 Characters.'
+                return ''
         }
-
-        const newRecord = {
-            id: account.id,
-            name: account.name,
-            log: newLog,
-            type: 'modify',
-            timestamp: Date()
-        }
-
-        // Axios request to post the new id number and data from spreadsheet object.
-        axios({
-
-            url: 'http://localhost:3001/api/putSheet',
-            method: 'PUT',
-            data: {
-                id: account.spreadId,
-                sheetId: sheetId,
-                username: account.username,
-                password: account.password,
-                sheet: sheet,
-                record: newRecord
-            }
-
-        }).then((reponse) => {
-            console.log(reponse);
-            postSpread();
-            resetDisplay();
-        }).catch((error) => {
-            console.log(error);
-        });
     }
 
     render() {
 
         const {
+            classes,
+            account,
+            dbSpread,
+            putSheet,
+            editMode,
+            setEditMode,
+            resetDisplay
+        } = this.props, {
             sheetId,
-            personData,
+            person,
+            meta,
             editPerson,
             editName,
             editPhoneTag,
@@ -519,7 +429,6 @@ export default class Sheet extends Component {
             newExtension,
             newRoom,
             newNote,
-            metaData,
             editMeta, 
             title, 
             editTitle, 
@@ -529,44 +438,18 @@ export default class Sheet extends Component {
             newNumber
         } = this.state;
 
-        const { 
-            account, 
-            data,
-            editMode,
-            setEditMode,
-            resetDisplay
-        } = this.props;
-
-        return <div className='sheet'>
-            {account !== '' ? (
-                <div className='sheet-modify'>
-                {account.auth.includes(data.id) || account.auth.includes('full') ? (
-                        editMode === '' ? (
-                            <Button
-                                className='sheet-modify-btn'
-                                onClick={() => setEditMode(data.id)}
-                            >Edit</Button>
-                        ) : (
-                            editMode === data.id ? (
-                                <>
-                                    <Button
-                                        className='sheet-modify-btn'
-                                        onClick={() => this.checkModification()}
-                                    >Save</Button>
-                                    <Button
-                                        className='sheet-modify-btn'
-                                        onClick={() => resetDisplay()}
-                                    >Return</Button>
-                                </>
-                            ) : null 
-                        )
-                    ) : null }
-                </div>
-            ) : null }
+        return <div className={classes.sheet}>
             <PersonTable 
+                classes={classes}
+                account={account}
+                dbSpread={dbSpread}
+                putSheet={putSheet}
+                setEditMode={setEditMode}
+                resetDisplay={resetDisplay}
                 editMode={editMode}
                 sheetId={sheetId}
-                personData={personData}
+                person={person}
+                meta={meta}
                 title={title}
                 editTitle={editTitle}
                 editPerson={editPerson}
@@ -599,20 +482,18 @@ export default class Sheet extends Component {
                 handleNewNote={this.handleNewNote}
                 addPersonRow={this.addPersonRow}
                 clearPersonRow={this.clearPersonRow}
+                inputError={this.inputError}
             />
             <MetaTable
+                classes={classes}
                 editMode={editMode}
                 sheetId={sheetId}
-                metaData={metaData}
+                meta={meta}
                 editMeta={editMeta}
                 editLine={editLine}
                 editNumber={editNumber}
                 newLine={newLine}
                 newNumber={newNumber}
-                editSheetTitle={this.editSheetTitle}
-                handleSheetTitle={this.handleSheetTitle}
-                replaceSheetTitle={this.replaceSheetTitle}
-                returnSheetTitle={this.returnSheetTitle}
                 editMetaRow={this.editMetaRow}
                 removeMetaRow={this.removeMetaRow}
                 handleEditLine={this.handleEditLine}
@@ -623,6 +504,7 @@ export default class Sheet extends Component {
                 handleNewNumber={this.handleNewNumber}
                 addMetaRow={this.addMetaRow}
                 clearMetaRow={this.clearMetaRow}
+                inputError={this.inputError}
             />
         </div>
     }

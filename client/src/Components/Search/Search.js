@@ -1,18 +1,34 @@
 import React from 'react';
-import './Search.css';
 import { 
     TextField,
-    Button 
+    Button, 
+    Container
 } from '@material-ui/core';
+import SearchIcon from '@material-ui/icons/Search';
 
-export default function Search(props) {
+export default (props) => {
 
-    return <div className='search'>
+    return <Container className={props.classes.container}>
         <TextField
-            className='search-text'
+            className={props.classes.input}
+            InputLabelProps={{
+                classes: {
+                    focused: props.classes.focused
+                },
+            }}
+            InputProps={{
+                classes: {
+                    root: props.classes.outline,
+                    focused: props.classes.focused,
+                    notchedOutline: props.classes.notchedOutline
+                },
+            }}
+            label={`Search ${props.dbSpread.title}`}
             value={props.searchInput}
             onChange={event => props.changeInput(event)}
-            label={`Search ${props.dbSpread.title}`}
+            error={props.searchHelper !== ''}
+            helperText={props.searchHelper}
+            variant='outlined'
             onKeyPress={event => {
                 if (props.searchInput === '') return
                 if (event.key === 'Enter') {
@@ -22,11 +38,13 @@ export default function Search(props) {
             }}
         />
         <Button 
-            className = "search-btn"
+            className={props.classes.searchBtn}
             onClick={() => {
                 if (props.searchInput === '') return
                 props.iterateSearch();
             }}
-        >Submit</Button>
-    </div>
+        >
+            <SearchIcon/>
+        </Button>
+    </Container>
 }
